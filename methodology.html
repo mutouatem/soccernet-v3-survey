@@ -1,0 +1,600 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow, noarchive">
+<style>
+:root{color-scheme:light dark;box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;padding:0}
+img{max-width:100%}
+[hidden]:not([hidden=until-found i]){display:none!important}
+</style>
+<title>SoccerNet-v3 方法论图谱</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@500;700&family=Noto+Sans+SC:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --paper:#F2F3F0; --surface:#FBFBF9; --surface-2:#EAECE6;
+  --ink:#16191A; --ink-2:#464D4C; --muted:#737B79; --rule:#DCE0D9; --rule-2:#C6CBC1;
+  --t-reid:#1E6FA8; --t-view:#7D4FA8; --t-occ:#AE3B34; --t-det:#5C8A1F;
+  --t-reid-bg:#1E6FA814; --t-view-bg:#7D4FA814; --t-occ-bg:#AE3B3414; --t-det-bg:#5C8A1F14;
+  --chart-grid:#D3D8CF; --band:#AE3B3412;
+  --serif:"Noto Serif SC",Songti SC,SimSun,Georgia,serif;
+  --sans:"Noto Sans SC",-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --paper:#161817; --surface:#1D201F; --surface-2:#242826;
+  --ink:#E9EBE7; --ink-2:#B2B9B5; --muted:#848C89; --rule:#2D312F; --rule-2:#3C423F;
+  --t-reid:#4F93CE; --t-view:#9E76CE; --t-occ:#CC5F57; --t-det:#76A03C;
+  --t-reid-bg:#4F93CE1F; --t-view-bg:#9E76CE1F; --t-occ-bg:#CC5F571F; --t-det-bg:#76A03C1F;
+  --chart-grid:#333835; --band:#CC5F571A;
+}}
+:root[data-theme="dark"]{
+  --paper:#161817; --surface:#1D201F; --surface-2:#242826;
+  --ink:#E9EBE7; --ink-2:#B2B9B5; --muted:#848C89; --rule:#2D312F; --rule-2:#3C423F;
+  --t-reid:#4F93CE; --t-view:#9E76CE; --t-occ:#CC5F57; --t-det:#76A03C;
+  --t-reid-bg:#4F93CE1F; --t-view-bg:#9E76CE1F; --t-occ-bg:#CC5F571F; --t-det-bg:#76A03C1F;
+  --chart-grid:#333835; --band:#CC5F571A;
+}
+
+*{box-sizing:border-box}
+body{background:var(--paper);color:var(--ink);font-family:var(--sans);
+  font-size:15px;line-height:1.85;-webkit-font-smoothing:antialiased;margin:0}
+a{color:inherit}
+:focus-visible{outline:2px solid var(--t-reid);outline-offset:3px;border-radius:2px}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+.shell{display:grid;grid-template-columns:200px minmax(0,1fr);gap:48px;
+  max-width:1100px;margin:0 auto;padding:0 20px}
+.main{max-width:70ch;padding-block:0 96px;min-width:0}
+
+/* ---- nav ---- */
+.nav{position:sticky;top:env(safe-area-inset-top,0px);align-self:start;
+  padding-block:40px;max-height:100vh;overflow-y:auto}
+.nav h2{font:500 11px/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;
+  color:var(--muted);margin:0 0 14px}
+.nav ol{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:2px}
+.nav a{display:flex;gap:9px;text-decoration:none;color:var(--ink-2);font-size:13px;
+  line-height:1.5;padding:5px 8px;border-radius:3px;border-left:2px solid transparent}
+.nav a:hover{background:var(--surface-2);color:var(--ink)}
+.nav .n{font:500 11px/1.6 var(--mono);color:var(--muted);flex:none;width:14px}
+
+/* ---- masthead ---- */
+.mast{padding-block:44px 0}
+.eyebrow{font:500 11px/1 var(--mono);letter-spacing:.16em;text-transform:uppercase;
+  color:var(--muted);margin:0 0 18px}
+h1{font-family:var(--serif);font-weight:700;font-size:clamp(30px,6vw,44px);
+  line-height:1.24;letter-spacing:-.01em;margin:0;text-wrap:balance}
+.sub{font-family:var(--serif);font-weight:500;font-size:clamp(16px,3vw,19px);
+  color:var(--ink-2);margin:12px 0 0;line-height:1.55;text-wrap:balance}
+.meta{display:flex;flex-wrap:wrap;gap:8px 22px;margin:26px 0 0;
+  padding-top:18px;border-top:1px solid var(--rule);
+  font:400 12px/1.6 var(--mono);color:var(--muted)}
+.meta b{font-weight:500;color:var(--ink-2)}
+
+/* ---- thesis ---- */
+.thesis{margin:36px 0 0;padding:22px 24px;background:var(--surface);
+  border:1px solid var(--rule);border-left:3px solid var(--t-occ)}
+.thesis p{margin:0;font-family:var(--serif);font-size:16px;line-height:1.8}
+.thesis p+p{margin-top:12px;font-family:var(--sans);font-size:14px;color:var(--ink-2)}
+
+/* ---- sections ---- */
+section{padding-block:52px 0;scroll-margin-top:24px}
+h2{font-family:var(--serif);font-weight:700;font-size:23px;line-height:1.4;
+  margin:0 0 6px;display:flex;gap:12px;align-items:baseline;text-wrap:balance}
+h2 .num{font:500 12px/1 var(--mono);color:var(--muted);flex:none;
+  padding-top:2px;letter-spacing:.06em}
+.dek{color:var(--muted);font-size:13.5px;margin:0 0 22px;padding-left:24px}
+h3{font-family:var(--serif);font-weight:700;font-size:16.5px;margin:32px 0 10px;line-height:1.5}
+h4{font-weight:700;font-size:14.5px;margin:22px 0 8px;color:var(--ink)}
+p{margin:0 0 15px}
+.main strong{font-weight:700}
+em{font-style:normal;background:linear-gradient(transparent 62%,var(--t-occ-bg) 62%);
+  padding:0 1px}
+
+ul{margin:0 0 15px;padding-left:0;list-style:none;display:flex;flex-direction:column;gap:11px}
+ul li{padding-left:18px;position:relative}
+ul li::before{content:"";position:absolute;left:2px;top:12px;width:5px;height:1px;
+  background:var(--rule-2)}
+
+/* ---- track chips ---- */
+.chip{display:inline-block;font:500 10.5px/1.55 var(--mono);letter-spacing:.05em;
+  padding:1px 6px;border-radius:2px;white-space:nowrap;vertical-align:1px}
+.c-reid{color:var(--t-reid);background:var(--t-reid-bg)}
+.c-view{color:var(--t-view);background:var(--t-view-bg)}
+.c-occ{color:var(--t-occ);background:var(--t-occ-bg)}
+.c-det{color:var(--t-det);background:var(--t-det-bg)}
+
+/* ---- tables ---- */
+.tw{overflow-x:auto;margin:0 0 18px;border:1px solid var(--rule);background:var(--surface)}
+table{border-collapse:collapse;width:100%;min-width:440px;font-size:13.5px}
+th,td{text-align:left;padding:9px 13px;border-bottom:1px solid var(--rule);
+  vertical-align:top;line-height:1.6}
+thead th{font:500 11px/1.5 var(--mono);letter-spacing:.07em;text-transform:uppercase;
+  color:var(--muted);background:var(--surface-2);white-space:nowrap}
+tbody tr:last-child td{border-bottom:0}
+td.num,th.num{font-family:var(--mono);font-variant-numeric:tabular-nums;white-space:nowrap}
+.hl td{background:var(--t-view-bg)}
+.yes{color:var(--t-det);font-weight:700}
+.no{color:var(--t-occ);font-weight:700}
+
+/* ---- figure ---- */
+figure{margin:24px 0;padding:18px 0 14px;border-top:1px solid var(--rule);
+  border-bottom:1px solid var(--rule)}
+figcaption{font:400 12px/1.7 var(--mono);color:var(--muted);margin-top:10px}
+figcaption b{font-weight:500;color:var(--ink-2)}
+.fig-title{font-weight:700;font-size:14px;margin:0 0 14px}
+.chart-scroll{overflow-x:auto}
+.chart-scroll svg{display:block;width:100%;min-width:460px;height:auto}
+svg text{font-family:var(--mono);fill:var(--ink-2)}
+svg .lbl{font-size:12px}
+svg .val{font-size:12px;font-weight:500;fill:var(--ink)}
+svg .tick{font-size:10.5px;fill:var(--muted)}
+.mark{transition:opacity .12s}
+.chart-scroll:hover .mark{opacity:.52}
+.chart-scroll .mark:hover{opacity:1}
+
+/* ---- mechanism blocks ---- */
+.mech{border:1px solid var(--rule);background:var(--surface);padding:20px 22px;margin:0 0 16px}
+.mech .mh{display:flex;align-items:baseline;gap:10px;margin:0 0 4px}
+.mech .mn{font:500 11px/1 var(--mono);color:var(--muted);letter-spacing:.08em}
+.mech h3{margin:0;font-size:16px}
+.mech .mt{color:var(--muted);font-size:13px;margin:2px 0 14px}
+.mech p:last-child{margin-bottom:0}
+
+/* ---- paths ---- */
+.path{border-left:2px solid var(--rule-2);padding:2px 0 2px 18px;margin:0 0 20px}
+.path h4{margin:0 0 6px}
+.path p:last-child{margin-bottom:0}
+.path-a{border-left-color:var(--t-occ)}
+.path-b{border-left-color:var(--t-view)}
+.path-c{border-left-color:var(--t-det)}
+
+/* ---- gaps ---- */
+.gaps{counter-reset:g;display:flex;flex-direction:column;gap:14px;
+  margin:0;padding:0;list-style:none}
+.gaps li{counter-increment:g;padding-left:34px;position:relative}
+.gaps li::before{content:counter(g);position:absolute;left:0;top:1px;
+  font:500 11px/20px var(--mono);width:20px;height:20px;text-align:center;
+  color:var(--muted);border:1px solid var(--rule-2);border-radius:50%;background:none}
+
+/* ---- index ---- */
+.idx{display:flex;flex-direction:column;gap:5px;margin:0 0 22px;padding:0;list-style:none}
+.idx li{display:flex;gap:10px;align-items:baseline;font-size:13.5px;line-height:1.65;
+  padding:0;position:static}
+.idx li::before{display:none}
+.idx .v{font:500 10.5px/1.6 var(--mono);color:var(--muted);flex:none;
+  width:104px;text-align:right;letter-spacing:.02em}
+.idx-h{display:flex;align-items:baseline;gap:10px;margin:26px 0 12px}
+.idx-h b{font-family:var(--serif);font-size:15px}
+.idx-h span{font:400 11.5px/1 var(--mono);color:var(--muted)}
+
+/* ---- reading order ---- */
+.ro{counter-reset:r;list-style:none;margin:0;padding:0;
+  display:flex;flex-direction:column;gap:0;border-top:1px solid var(--rule)}
+.ro li{counter-increment:r;display:flex;gap:16px;align-items:baseline;
+  padding:13px 4px;border-bottom:1px solid var(--rule);position:static}
+.ro li::before{content:counter(r);font:500 12px/1.6 var(--mono);color:var(--muted);flex:none}
+.ro .t{font-weight:700;font-size:14.5px;flex:none}
+.ro .w{color:var(--ink-2);font-size:13.5px;line-height:1.6}
+
+footer{margin-top:64px;padding-top:22px;border-top:1px solid var(--rule);
+  font:400 12px/1.8 var(--mono);color:var(--muted)}
+
+/* ---- print ---- */
+@page{margin:17mm 15mm}
+@media print{
+  :root,:root[data-theme="dark"],:root:not([data-theme="light"]){
+    --paper:#fff; --surface:#FBFBF9; --surface-2:#EFF1EC;
+    --ink:#16191A; --ink-2:#464D4C; --muted:#6B736F; --rule:#D3D8CF; --rule-2:#BCC2B7;
+    --t-reid:#1E6FA8; --t-view:#7D4FA8; --t-occ:#AE3B34; --t-det:#5C8A1F;
+    --t-reid-bg:#1E6FA81A; --t-view-bg:#7D4FA81A; --t-occ-bg:#AE3B341A; --t-det-bg:#5C8A1F1A;
+    --chart-grid:#D3D8CF; --band:#AE3B3414;
+  }
+  *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  body{font-size:10.5pt;line-height:1.75}
+  .shell{display:block;max-width:none;padding:0}
+  .nav{display:none}
+  .main{max-width:none;padding-block:0}
+  .mast{padding-block:0}
+  h1{font-size:25pt}
+  .sub{font-size:12pt}
+  section{padding-block:22px 0;break-before:auto}
+  h2{font-size:15pt;break-after:avoid}
+  h3,h4,.fig-title,.idx-h{break-after:avoid}
+  .dek{break-after:avoid}
+  figure,.mech,.path,.tw,.thesis,.ro li,.idx li,.gaps li{break-inside:avoid}
+  table{min-width:0;font-size:9pt}
+  th,td{padding:6px 9px}
+  .chart-scroll{overflow:visible}
+  .chart-scroll svg{min-width:0;max-width:150mm}
+  .chart-scroll:hover .mark,.mark{opacity:1}
+  .chart-scroll .mark rect[opacity]{opacity:.34}
+  a{text-decoration:none}
+  footer{break-inside:avoid}
+}
+
+@media (max-width:900px){
+  .shell{grid-template-columns:1fr;gap:0}
+  .nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;
+    padding-block:10px;max-height:none;background:var(--paper);
+    border-bottom:1px solid var(--rule);margin:0 -20px;padding-inline:20px}
+  .nav h2{display:none}
+  .nav ol{flex-direction:row;gap:0;overflow-x:auto;scrollbar-width:none}
+  .nav ol::-webkit-scrollbar{display:none}
+  .nav a{white-space:nowrap;border-left:0;padding:6px 10px}
+  .nav .n{display:none}
+  .mast{padding-block:30px 0}
+  .idx .v{width:86px}
+  .ro li{flex-wrap:wrap;gap:6px 12px}
+}
+</style>
+</head>
+<body>
+<div class="shell">
+
+<nav class="nav" aria-label="章节导航">
+  <h2>目录</h2>
+  <ol>
+    <li><a href="#s1"><span class="n">01</span>整体格局</a></li>
+    <li><a href="#s2"><span class="n">02</span>四条技术主线</a></li>
+    <li><a href="#s3"><span class="n">03</span>三个共同机制</a></li>
+    <li><a href="#s4"><span class="n">04</span>可比基准</a></li>
+    <li><a href="#s5"><span class="n">05</span>迁移分析</a></li>
+    <li><a href="#s6"><span class="n">06</span>选题空白</a></li>
+    <li><a href="#s7"><span class="n">07</span>论文索引</a></li>
+  </ol>
+</nav>
+
+<main class="main">
+
+<header class="mast">
+  <p class="eyebrow">方法论参考文献综述</p>
+  <h1>跨视角、遮挡与重识别的 37 篇</h1>
+  <p class="sub">面向 SoccerNet-v3 的方法迁移分析 · 2024–2026 顶会与期刊</p>
+  <div class="meta">
+    <span><b>37</b> 篇全文精读</span>
+    <span><b>CVPR</b> 8 · <b>ECCV</b> 10 · <b>AAAI</b> 2</span>
+    <span><b>ICML</b> 1 · <b>NeurIPS</b> 1 · <b>BMVC</b> 1</span>
+    <span>期刊 <b>11</b> · workshop <b>3</b></span>
+    <span>2026-09-20</span>
+  </div>
+</header>
+
+<div class="thesis">
+  <p>这 37 篇里，<strong>没有一篇在做「同一时刻、多机位、同一批外观高度相似的目标」</strong>——而这恰好是 SoccerNet-v3 的定义性结构。</p>
+  <p>最接近的是空地跨视角 Re-ID 一支，但它匹配的是<strong>不同时刻</strong>、<strong>外观可区分</strong>的个体。这个空档是最值得占的位置，第 5 节展开。</p>
+</div>
+
+<section id="s1">
+  <h2><span class="num">01</span>整体格局</h2>
+  <p class="dek">火力集中在哪里，以及一个被空出来的方向</p>
+
+  <p>12 篇 Re-ID 论文按子方向拆开之后，出现了一个很清楚的信号：2026 年顶会 Re-ID 的火力几乎全压在<strong>终身学习</strong>和<strong>多模态</strong>两条线上，<em>视角问题只有 ViSA 一篇在正面打</em>。</p>
+
+  <figure>
+    <p class="fig-title">12 篇 Re-ID 论文的子方向分布</p>
+    <div class="chart-scroll">
+      <svg viewBox="0 0 520 200" role="img" aria-label="Re-ID 子方向分布条形图：多模态/跨光谱 4 篇，终身/持续学习 3 篇，通用化/基础模型 3 篇，跨物种/动物 1 篇，视角变化 1 篇">
+        <g stroke="var(--chart-grid)" stroke-width="1">
+          <line x1="230.5" y1="8" x2="230.5" y2="184"/>
+          <line x1="302.5" y1="8" x2="302.5" y2="184"/>
+          <line x1="374.5" y1="8" x2="374.5" y2="184"/>
+          <line x1="446.5" y1="8" x2="446.5" y2="184"/>
+          <line x1="158.5" y1="8" x2="158.5" y2="184" stroke="var(--rule-2)"/>
+        </g>
+        <g class="mark"><title>多模态 / 跨光谱：4 篇</title>
+          <text class="lbl" x="146" y="29" text-anchor="end">多模态 / 跨光谱</text>
+          <rect x="158" y="14" width="288" height="20" rx="3" fill="var(--t-reid)" opacity=".34"/>
+          <text class="val" x="456" y="29">4</text></g>
+        <g class="mark"><title>终身 / 持续学习：3 篇</title>
+          <text class="lbl" x="146" y="63" text-anchor="end">终身 / 持续学习</text>
+          <rect x="158" y="48" width="216" height="20" rx="3" fill="var(--t-reid)" opacity=".34"/>
+          <text class="val" x="384" y="63">3</text></g>
+        <g class="mark"><title>通用化 / 基础模型：3 篇</title>
+          <text class="lbl" x="146" y="97" text-anchor="end">通用化 / 基础模型</text>
+          <rect x="158" y="82" width="216" height="20" rx="3" fill="var(--t-reid)" opacity=".34"/>
+          <text class="val" x="384" y="97">3</text></g>
+        <g class="mark"><title>跨物种 / 动物：1 篇</title>
+          <text class="lbl" x="146" y="131" text-anchor="end">跨物种 / 动物</text>
+          <rect x="158" y="116" width="72" height="20" rx="3" fill="var(--t-reid)" opacity=".34"/>
+          <text class="val" x="240" y="131">1</text></g>
+        <g class="mark"><title>视角变化：1 篇（仅 ViSA）</title>
+          <text class="lbl" x="146" y="165" text-anchor="end" style="fill:var(--t-view);font-weight:500">视角变化</text>
+          <rect x="158" y="150" width="72" height="20" rx="3" fill="var(--t-view)"/>
+          <text class="val" x="240" y="165">1</text>
+          <text class="tick" x="256" y="165">ViSA</text></g>
+        <g class="tick">
+          <text x="230.5" y="196" text-anchor="middle">1</text>
+          <text x="302.5" y="196" text-anchor="middle">2</text>
+          <text x="374.5" y="196" text-anchor="middle">3</text>
+          <text x="446.5" y="196" text-anchor="middle">4</text>
+        </g>
+      </svg>
+    </div>
+    <figcaption>单位：论文篇数。<b>视角变化</b>一栏只有 ViSA（CVPR 2026）一篇。</figcaption>
+  </figure>
+
+  <p>这不是因为问题被解决了，而是<strong>因为缺数据集</strong>——MOO（CVPRW 2026）的动机陈述里说得很直白：现有数据集缺乏精确角度标注，导致视角依赖性根本无法被系统分析。</p>
+</section>
+
+<section id="s2">
+  <h2><span class="num">02</span>四条技术主线</h2>
+  <p class="dek">各自在解什么，以及各自的立场</p>
+
+  <h3><span class="chip c-reid">RE-ID</span> 从「学更好的特征」转向「管理知识的生命周期」</h3>
+  <p>这批论文有个明显共性：<strong>问题定义越来越贴近部署</strong>，而不是刷 benchmark。</p>
+  <p><strong>终身学习三篇</strong>解的是同一件事的三个侧面。VLAD 指出现有方法直接套 VLM 时只做全局对齐，细粒度属性知识被浪费。PAD 的观察更精炼：<em>预训练视觉语言模型里冻结的文本编码器，本身就是跨域稳定的语义锚点</em>——视觉侧用 EMA teacher 保持可塑性，文本侧蒸馏 prompt 保持稳定性，非对称分工。SCORE 则推进到 Cloth-Hybrid 场景：换装与不换装数据交替出现时，两类知识互相冲突，灾难性遗忘被显著放大。</p>
+  <p><strong>多模态四篇里有一个值得注意的收敛</strong>：MFEN（CVPR 2026 Highlight）和 FUSE（ICML 2026）互不相识，却做出了同一个判断——现有方法过度依赖低频线索（颜色、光照、粗略外观），中高频结构（几何、纹理、身份判别细节）被忽略。两篇独立指向频域，是今年这个方向最强的信号。</p>
+  <p>UniGeo 是唯一一篇同时打遮挡、换装、跨模态的通用 Re-ID。它的核心观察很有价值：<strong>朴素引入单目 3D 先验会造成严重负迁移</strong>，因为极端视觉退化下几何估计本身就是噪声。解法是把 3D 信息的「提取」与「使用」解耦，中间加一道可靠性门——记住这个设计，第 3 节还会出现。</p>
+
+  <h3><span class="chip c-view">跨视角</span> 视角不变性正在被质疑</h3>
+  <p><strong>ViSA 是这批里立场最鲜明的一篇。</strong>它直接挑战 AG-ReID 长期默认的「视角不变」范式：追求视角不变，实际上强制了部件级对齐，<em>这会把 view-specific 的线索连同判别性身份信息一起丢掉</em>。ViSA 转向 view-aware——不是消除视角差异，而是利用它。</p>
+  <p><strong>3D-LENS 形式化了一个新问题：Single-View AG-ReID</strong>——只有一个真实视角的训练数据，要泛化到未见视角（动机是野外搜救，目标域根本没数据）。做法是大规模 3D 网格重建驱动的几何一致新视角合成，再配一套抑制合成-真实偏差的表示学习。这是「没有配对跨视角标注怎么办」的直接答案。</p>
+  <p><strong>MOO 是同一作者的配套工作</strong>：1000 头牛的合成 AG-ReID 数据集，带精确角度标注，专门回答「哪些视角组合最有利于识别」。如果要论证多视角标注的独特价值，MOO 就是现成的方法论模板。</p>
+  <p>几何类三篇各有角度：LAYS 把偏航角从平移中解耦，用径向不变的线共识投票达到亚度级精度，未知偏航场景提升 <span style="font-family:var(--mono)">28–45</span> 个百分点；TrajLoc 引入路线文本描述作为与视频互补的序列模态；X²Localizer 把跨视角地理定位改造成渐进式，支持变长时间预算与失败恢复。</p>
+  <p><strong>VisualSync（NeurIPS 2025）是基础设施性质的一篇</strong>：核心洞察是任意运动 3D 点在两相机共视时，一旦同步就必须满足对极约束，于是把时间偏移当作优化变量去最小化对极误差，中位误差低于 <span style="font-family:var(--mono)">50ms</span>。要自建多视角数据，这是绕不开的前置工具。</p>
+
+  <h3><span class="chip c-occ">遮挡</span> 顶会做「记忆」，期刊做「特征」</h3>
+  <p>这是分化最明显的一组。13 篇里 6 篇顶会 + 7 篇期刊，<strong>两边在做完全不同的事</strong>。</p>
+  <p><strong>顶会那 6 篇，没有一篇的标题里有「遮挡 Re-ID」</strong>，它们把遮挡包在更大的问题里：</p>
+  <ul>
+    <li><strong>BeyondSight</strong>（ECCV 2026）— 端到端自动驾驶。核心论点：大多数系统把「目标存在」隐式耦合到「瞬时可观测」，导致长时遮挡下目标假设退化甚至消失。解法是<em>把存在性与可观测性解耦</em>，时序传播 actor query。配套发布 nuScenes-Permanence。</li>
+    <li><strong>Whareformer</strong>（ECCV 2026）— OSNOM 任务的第一个学习式解法。可更新的轨迹记忆 + 前馈式轨迹分配，联合推理 what（外观演化）与 where（3D 位置）。只用 56 个视频训练，在 260 个长视频上达到 SOTA。</li>
+    <li><strong>AR2-4FV</strong>（CVPR 2026）— 固定视角长时指代。离线从静态背景蒸馏 Anchor Bank，目标遮挡或离场时充当持久语义记忆。重捕获率 <span style="font-family:var(--mono)">+10.3%</span>，重捕获延迟 <span style="font-family:var(--mono)">−24.2%</span>。</li>
+    <li><strong>Syn2RealTrack</strong>（ECCVW 2026）— 方法论值得学：不把合成-真实差距当成一个模块去吸收，而是<em>分解成标定、形状先验、目标数量假设三个可分别医治的入口</em>。其中「可见性加权的部件描述符，部件被遮挡时弃权而非猜测」是很干净的设计。</li>
+    <li><strong>RAF</strong>（ECCV 2026）— 批评现有方法的置信度图只靠检测损失间接学习，没有直接监督信号，于是显式监督逐像素可靠性估计。</li>
+    <li><strong>DG-Det</strong>（ACM MM 2026）— 拥挤场景视频计数。深度线索 + 多尺度 RGB-D 交叉注意力 + 显式遮挡预测。</li>
+  </ul>
+  <p><strong>期刊那 7 篇则全部是经典范式</strong>，而且解法高度同质化——<em>其中 3 篇的核心都是「模拟遮挡」而非「检测遮挡」</em>：DOA 用 Diversity Occlusion Simulation 生成多样遮挡模式；CENet 用特征图交叉擦除模拟障碍物与非目标行人遮挡；SIF 批评现有方法只针对孤立遮挡类型优化、忽略多场景遮挡的耦合效应，用场景先验生成多源耦合样本。</p>
+  <p>另外三篇走别的路：SGFNet 用 CLIP，但指出通用文本 prompt 抓不住样本级细粒度语义，于是做分割 + 逐样本文本生成；OCCNet 首次系统处理「遮挡 × 可见光-红外」的双重退化，并构建了 Occluded-SYSU-MM01 与 Occluded-RegDB 两个基准；Enhance Heads 的切入点最特别——自注意力会把遮挡的干扰特征扩散到所有 token，所以<strong>改在通道维而非空间维做增强</strong>。</p>
+  <p>综述方面，Ning et al.（ESWA 2024，167 引）是标准入口，把遮挡拆成噪声、缺失、对齐三个子问题。注意它与 SIF 出自同一课题组（中科院半导体所 Enhao Ning），综述配自家方法读能看清完整判断路径。</p>
+
+  <h3><span class="chip c-det">检测 / YOLO</span> 训练效率与部署约束</h3>
+  <p>只有 4 篇，但主题异常集中——<strong>没有一篇在改进检测精度本身</strong>。</p>
+  <ul>
+    <li><strong>Does YOLO Really Need to See Every Training Image in Every Epoch?</strong>（CVPR 2026 主会）问题提得漂亮：YOLO 以推理快著称，训练却要每个 epoch 遍历所有图像，与 "You Only Look Once" 的哲学自相矛盾。解法是按「学习充分度」把样本分成易/中/难三档动态调度。</li>
+    <li><strong>Le-DETR</strong>（CVPR 2026 Findings）— 实时 DETR 难以从零复现，因为 backbone 预训练开销过大，这本身在阻碍新架构探索。</li>
+    <li><strong>YOLO-NAS-Bench</strong>（CVPRW 2026 Oral）— 采样 1000 个架构在 COCO-mini 上训练，建 LightGBM 代理预测器。</li>
+    <li><strong>Real-Time SFOD</strong>（ECCV 2026）— 基于 YOLOv10 双头无 NMS 结构做无源域适应。</li>
+  </ul>
+</section>
+
+<section id="s3">
+  <h2><span class="num">03</span>三个共同机制</h2>
+  <p class="dek">通读之后才浮现的部分——下面三个设计模式在四个方向里反复独立出现</p>
+
+  <div class="mech">
+    <div class="mh"><span class="mn">机制 I</span><h3>可靠性门控</h3></div>
+    <p class="mt">决定「何时不相信某个线索」</p>
+    <div class="tw">
+      <table>
+        <thead><tr><th>论文</th><th>方向</th><th>具体形式</th></tr></thead>
+        <tbody>
+          <tr><td>UniGeo</td><td><span class="chip c-reid">RE-ID</span></td><td>一致性感知可靠性门，防止 3D 先验负迁移</td></tr>
+          <tr><td>RAF</td><td><span class="chip c-occ">遮挡</span></td><td><strong>显式监督</strong>逐像素可靠性，而非靠检测损失间接学</td></tr>
+          <tr><td>Syn2RealTrack</td><td><span class="chip c-occ">遮挡</span></td><td>可见性加权部件描述符，遮挡时<strong>弃权而非猜测</strong></td></tr>
+          <tr><td>AR2-4FV</td><td><span class="chip c-reid">RE-ID</span></td><td>ReID-Gating，用位移线索决定是否信任身份匹配</td></tr>
+          <tr><td>STMI</td><td><span class="chip c-reid">RE-ID</span></td><td>反对硬 token 过滤，改用软调制</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>共同点：<strong>融合不再是无条件的加权求和，而是先判断这个线索此刻值不值得用。</strong>RAF 那句批评尤其锋利——置信度图如果只通过下游任务损失学习，等于没有监督。</p>
+  </div>
+
+  <div class="mech">
+    <div class="mh"><span class="mn">机制 II</span><h3>存在性与可观测性解耦</h3></div>
+    <p class="mt">用记忆而非特征对抗遮挡</p>
+    <p>BeyondSight 把这件事说得最清楚：<strong>目标不可见 ≠ 目标不存在。</strong>Whareformer 的可更新轨迹记忆、AR2-4FV 的 Anchor Bank、BeyondSight 的持久 actor 假设，三者形式不同但内核一致：<em>在观测中断期间，由记忆而非外观特征维持身份。</em></p>
+    <p>这条线对足球场景的意义见第 5 节——它可能比所有遮挡 Re-ID 方法都更适用。</p>
+  </div>
+
+  <div class="mech">
+    <div class="mh"><span class="mn">机制 III</span><h3>视角特异性的回归</h3></div>
+    <p class="mt">拒绝把视角差异抹平</p>
+    <p>ViSA 反对视角不变，MOO 主张量化视角依赖性，CrossVL 显式建模视角间的复杂度差异（地面视角密集且高度遮挡、空中视角稀疏且全局有序，固定融合机制处理不了这种系统性差异），LAYS 把偏航角从位姿中解耦单独求解。<strong>四篇都在把视角本身当作可利用的信息，而不是要消除的噪声。</strong></p>
+  </div>
+</section>
+
+<section id="s4">
+  <h2><span class="num">04</span>可比基准</h2>
+  <p class="dek">Occluded-DukeMTMC 上的四篇，以及一个饱和信号</p>
+
+  <figure>
+    <p class="fig-title">Occluded-DukeMTMC · Rank-1 准确率</p>
+    <div class="chart-scroll">
+      <svg viewBox="0 0 520 180" role="img" aria-label="Occluded-DukeMTMC Rank-1 点图：DOA 77.7%，SGFNet 76.5%，SIF 76.2%，Enhance Heads 73.2%">
+        <rect x="329" y="16" width="92" height="120" fill="var(--band)"/>
+        <text class="tick" x="375" y="12" text-anchor="middle">前三名聚集在 1.5 个百分点内</text>
+        <g stroke="var(--chart-grid)" stroke-width="1">
+          <line x1="120.5" y1="16" x2="120.5" y2="146"/>
+          <line x1="222.5" y1="16" x2="222.5" y2="146"/>
+          <line x1="325.5" y1="16" x2="325.5" y2="146"/>
+          <line x1="428.5" y1="16" x2="428.5" y2="146"/>
+        </g>
+        <line x1="120" y1="146.5" x2="480" y2="146.5" stroke="var(--rule-2)" stroke-width="1"/>
+        <g class="mark"><title>DOA (TCSVT 2026)：Rank-1 77.7%</title>
+          <text class="lbl" x="110" y="36" text-anchor="end">DOA</text>
+          <circle cx="413" cy="32" r="5.5" fill="var(--t-occ)"/>
+          <text class="val" x="426" y="36">77.7</text></g>
+        <g class="mark"><title>SGFNet (TIFS 2025)：Rank-1 76.5%</title>
+          <text class="lbl" x="110" y="66" text-anchor="end">SGFNet</text>
+          <circle cx="351" cy="62" r="5.5" fill="var(--t-occ)"/>
+          <text class="val" x="364" y="66">76.5</text></g>
+        <g class="mark"><title>SIF (EAAI 2026)：Rank-1 76.2%</title>
+          <text class="lbl" x="110" y="96" text-anchor="end">SIF</text>
+          <circle cx="336" cy="92" r="5.5" fill="var(--t-occ)"/>
+          <text class="val" x="349" y="96">76.2</text></g>
+        <g class="mark"><title>Enhance Heads (Sensors J. 2025)：Rank-1 73.2%</title>
+          <text class="lbl" x="110" y="126" text-anchor="end">Enhance Heads</text>
+          <circle cx="182" cy="122" r="5.5" fill="var(--t-occ)" opacity=".45"/>
+          <text class="val" x="195" y="126">73.2</text></g>
+        <g class="tick">
+          <text x="120.5" y="164" text-anchor="middle">72</text>
+          <text x="222.5" y="164" text-anchor="middle">74</text>
+          <text x="325.5" y="164" text-anchor="middle">76</text>
+          <text x="428.5" y="164" text-anchor="middle">78</text>
+          <text x="480" y="164" text-anchor="end">%</text>
+        </g>
+      </svg>
+    </div>
+    <figcaption>横轴为 Rank-1 准确率，数字均回溯各篇原文核对。</figcaption>
+  </figure>
+
+  <div class="tw">
+    <table>
+      <thead><tr><th>方法</th><th>出处</th><th class="num">Rank-1</th><th class="num">mAP</th></tr></thead>
+      <tbody>
+        <tr><td><strong>DOA</strong></td><td>TCSVT 2026 EA</td><td class="num"><strong>77.7%</strong></td><td class="num">66.8%</td></tr>
+        <tr><td><strong>SGFNet</strong></td><td>TIFS 2025</td><td class="num">76.5%</td><td class="num">—</td></tr>
+        <tr><td><strong>SIF</strong></td><td>EAAI 2026</td><td class="num">76.2%</td><td class="num">65.8%</td></tr>
+        <tr><td>Enhance Heads</td><td>Sensors J. 2025</td><td class="num">73.2%</td><td class="num">—</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p>注意前三名的间距：<span style="font-family:var(--mono)">77.7 / 76.5 / 76.2</span>——<strong>差距在 1.5 个百分点以内，典型的饱和信号</strong>。在这个基准上再挤零点几个百分点，很难构成顶会级贡献，这也正好解释了第 2 节里那个顶会/期刊的分化。</p>
+</section>
+
+<section id="s5">
+  <h2><span class="num">05</span>迁移到 SoccerNet-v3</h2>
+  <p class="dek">哪些能用、哪些不能用，以及为什么「不能用」反而是机会</p>
+
+  <h3>结构同构性</h3>
+  <p>SoccerNet-v3 的核心是<strong>同一时刻、主播视角与回放视角之间的实例级对应</strong>。在本目录里结构最接近的是 AG-ReID 一支：</p>
+  <div class="tw">
+    <table>
+      <thead><tr><th>SoccerNet-v3</th><th>AG-ReID</th><th>同构</th></tr></thead>
+      <tbody>
+        <tr><td>主播视角 ↔ 回放视角</td><td>地面视角 ↔ 无人机视角</td><td><span class="yes">高</span> 剧烈视角差下的实例检索</td></tr>
+        <tr class="hl"><td>同一时刻</td><td><strong>不同时刻</strong></td><td><span class="no">✗</span> 关键差异</td></tr>
+        <tr class="hl"><td>外观高度相似（同队同球衣）</td><td><strong>外观可区分</strong></td><td><span class="no">✗</span> 关键差异</td></tr>
+        <tr><td>有配对标注</td><td>3D-LENS 假设无配对</td><td><span class="yes">✓</span> v3 条件更好</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>一个必须正视的负面判断</h3>
+  <p><strong>这批遮挡 Re-ID 方法大多不能直接用在足球上，原因是外观歧义。</strong></p>
+  <p>所有主流遮挡 Re-ID 的隐含假设是：只要恢复出未被遮挡区域的特征，身份就可判别。这个假设在监控场景成立（行人衣着各异），<em>在足球场上不成立</em>——同队 11 人穿完全相同的球衣，遮挡恢复出来的躯干特征对区分队友毫无帮助。真正判别性的线索只有球衣号码，而号码恰恰是遮挡与视角变化下最先失效的。</p>
+  <p>本目录里唯一直面这个问题的是 <strong>CENet</strong>（PRL 2025），它明确区分了「障碍物遮挡」和<strong>「非目标行人遮挡」</strong>——后者正是足球场的主要遮挡形式。这篇虽然只是 PRL，但对这个问题比很多顶会论文更对口。</p>
+  <p>这个负面判断反过来是机会：<strong>如果能论证「外观不可区分条件下的跨视角 Re-ID」是一个现有方法失效的新设定，这本身就够当一篇论文的立论基础。</strong></p>
+
+  <h3>三条可操作的迁移路径</h3>
+
+  <div class="path path-a">
+    <h4>路径 A · 把记忆机制搬到球员跟踪<span style="font-weight:400;color:var(--muted);font-size:13px"> — 最成熟</span></h4>
+    <p>BeyondSight 的存在性/可观测性解耦 + Whareformer 的轨迹记忆，天然适配「球员被遮挡后重新出现」。足球场景比自动驾驶更友好：球员数量固定（22+3）、不会真正离场、场地几何已知。<strong>Syn2RealTrack 的「已知目标数量」假设在足球里是真实成立的</strong>，这是个便宜的先验。</p>
+  </div>
+
+  <div class="path path-b">
+    <h4>路径 B · 用 3D-LENS 的思路补足视角<span style="font-weight:400;color:var(--muted);font-size:13px"> — 最新颖</span></h4>
+    <p>v3 已经有配对的跨视角标注，比 3D-LENS 的 single-view 设定条件更好。可以反过来做：用 v3 的配对数据验证「3D 提升 + 新视角合成」的有效性，再推广到只有单机位的低成本转播场景。</p>
+  </div>
+
+  <div class="path path-c">
+    <h4>路径 C · MOO 式的视角依赖性量化<span style="font-weight:400;color:var(--muted);font-size:13px"> — 最容易出成果</span></h4>
+    <p>MOO 论证了「现有数据集缺角度标注，导致视角依赖性无法被系统分析」。<strong>SoccerNet-v3 恰好有多视角对应标注</strong>——做一篇「哪种视角组合最有利于球员 Re-ID」的实证分析，数据现成、方法论有模板、且填补 MOO 明确指出的空白。</p>
+  </div>
+
+  <p style="color:var(--ink-2);font-size:13.5px">前置工具：若要扩展多机位数据，<strong>VisualSync 的时间对齐是必要前置</strong>——v3 的回放片段与主播流之间本身就存在时间偏移。</p>
+</section>
+
+<section id="s6">
+  <h2><span class="num">06</span>选题空白</h2>
+  <p class="dek">通读 37 篇之后，以下位置目前是空的</p>
+  <ol class="gaps">
+    <li><strong>同时刻多视角 + 外观不可区分</strong>的 Re-ID 设定 —— 全目录无人做。</li>
+    <li><strong>视角变化与遮挡的耦合效应</strong> —— SIF 论证了多种遮挡类型之间的耦合值得研究，但没人研究「视角变化 × 遮挡」的耦合。而这正是 v3 数据的天然属性。</li>
+    <li><strong>体育场景的可靠性门控</strong> —— 机制 I 在自动驾驶和通用 Re-ID 里已成熟，体育视觉里还没有对应工作。<em>球衣号码可读性就是天然的可靠性信号。</em></li>
+    <li><strong>频域方法在体育 Re-ID 的应用</strong> —— MFEN 与 FUSE 独立指向频域，但都在跨光谱场景。球衣的条纹/色块是强频域结构，这个交叉点没人碰。</li>
+  </ol>
+</section>
+
+<section id="s7">
+  <h2><span class="num">07</span>论文索引</h2>
+  <p class="dek">37 篇全览，按方向分组</p>
+
+  <div class="idx-h"><b>重识别</b><span>12 篇</span><span class="chip c-reid">RE-ID</span></div>
+  <ul class="idx">
+    <li><span class="v">CVPR 2026</span>VLAD · 属性解耦与强化的终身 Re-ID</li>
+    <li><span class="v">CVPR 2026</span>PAD · Prompt 锚定的视觉-文本蒸馏</li>
+    <li><span class="v">CVPR 2026 ★</span>MFEN · 多频段专家网络（Highlight）</li>
+    <li><span class="v">CVPR 2026</span>AR2-4FV · 固定视角长时指代与重识别</li>
+    <li><span class="v">CVPR 2026</span>MVEB · 通用多模态嵌入中的视觉身份</li>
+    <li><span class="v">ECCV 2026</span>UniGeo · 可靠性门控的单目 3D 增强</li>
+    <li><span class="v">ECCV 2026</span>SCORE · 子分布感知的 Cloth-Hybrid 终身学习</li>
+    <li><span class="v">ECCV 2026</span>SCL · 跨物种动物重识别</li>
+    <li><span class="v">ICML 2026</span>FUSE · 频域统一与谱能量对齐</li>
+    <li><span class="v">AAAI 2026</span>STMI · 分割引导 token 调制 + 跨模态超图</li>
+    <li><span class="v">CVPR 2024</span>RDE · 文本到图像 Re-ID 的噪声对应学习 <span style="color:var(--muted);font-family:var(--mono);font-size:11px">252 引</span></li>
+    <li><span class="v">IJCV 2025</span>Transformer Re-ID 综述 <span style="color:var(--muted);font-family:var(--mono);font-size:11px">124 引</span></li>
+  </ul>
+
+  <div class="idx-h"><b>跨视角</b><span>8 篇</span><span class="chip c-view">跨视角</span></div>
+  <ul class="idx">
+    <li><span class="v">CVPR 2026</span>ViSA · 视角感知语义对齐（空地 Re-ID）</li>
+    <li><span class="v">CVPR 2026</span>CrossVL · 复杂度感知的跨视角视觉语言检测</li>
+    <li><span class="v">ECCV 2026</span>3D-LENS · 单视角空地 Re-ID 的新视角合成</li>
+    <li><span class="v">ECCV 2026</span>LAYS · 径向不变的跨视角偏航估计</li>
+    <li><span class="v">ECCV 2026</span>TrajLoc · 轨迹感知的跨视角地理定位</li>
+    <li><span class="v">NeurIPS 2025</span>VisualSync · 基于跨视角运动的多相机同步</li>
+    <li><span class="v">BMVC 2026</span>X²Localizer · 渐进式跨视角视频地理定位</li>
+    <li><span class="v">CVPRW 2026</span>MOO · 带角度标注的多视角观测数据集</li>
+  </ul>
+
+  <div class="idx-h"><b>遮挡</b><span>13 篇</span><span class="chip c-occ">遮挡</span></div>
+  <ul class="idx">
+    <li><span class="v">ECCV 2026</span>BeyondSight · 端到端驾驶的目标恒存性</li>
+    <li><span class="v">ECCV 2026</span>Whareformer · 长时第一视角视频的轨迹记忆</li>
+    <li><span class="v">ECCV 2026</span>RAF · 显式监督的多传感器可靠性融合</li>
+    <li><span class="v">ACM MM 2026</span>DG-Det · 深度引导的拥挤场景视频计数</li>
+    <li><span class="v">AAAI 2026</span>TSBOW · 极端天气遮挡车辆基准</li>
+    <li><span class="v">ECCVW 2026</span>Syn2RealTrack · 合成-真实差距的三段分解</li>
+    <li><span class="v">TCSVT 2026</span>DOA · 多样性遮挡模拟 <span style="color:var(--muted);font-family:var(--mono);font-size:11px">R1 77.7</span></li>
+    <li><span class="v">TCSVT 2026</span>OCCNet · 遮挡 × 可见光-红外双重退化</li>
+    <li><span class="v">TIFS 2025</span>SGFNet · 语义引导与聚焦网络 <span style="color:var(--muted);font-family:var(--mono);font-size:11px">R1 76.5</span></li>
+    <li><span class="v">PRL 2025</span>CENet · 交叉擦除，<strong>处理非目标行人遮挡</strong></li>
+    <li><span class="v">EAAI 2026</span>SIF · 多场景耦合遮挡的协同交互框架 <span style="color:var(--muted);font-family:var(--mono);font-size:11px">R1 76.2</span></li>
+    <li><span class="v">Sensors J. 2025</span>Enhance Heads · 通道维而非空间维增强</li>
+    <li><span class="v">ESWA 2024</span>遮挡 Re-ID 综述 <span style="color:var(--muted);font-family:var(--mono);font-size:11px">167 引</span></li>
+  </ul>
+
+  <div class="idx-h"><b>检测 / YOLO</b><span>4 篇</span><span class="chip c-det">检测</span></div>
+  <ul class="idx">
+    <li><span class="v">CVPR 2026</span>Does YOLO Really Need to See Every Training Image…</li>
+    <li><span class="v">CVPR 2026</span>Le-DETR · 高效编码器设计（Findings）</li>
+    <li><span class="v">ECCV 2026</span>Real-Time SFOD · YOLOv10 双头无源域适应</li>
+    <li><span class="v">CVPRW 2026 ★</span>YOLO-NAS-Bench · 代理基准（Oral）</li>
+  </ul>
+
+  <h3>优先阅读顺序</h3>
+  <p>若时间有限，按此顺序读 6 篇即可覆盖主要论点。</p>
+  <ol class="ro">
+    <li><span class="t">ViSA</span><span class="w">视角不变范式的反方立场</span></li>
+    <li><span class="t">3D-LENS</span><span class="w">跨视角缺口的合成式补法</span></li>
+    <li><span class="t">BeyondSight</span><span class="w">存在性与可观测性解耦</span></li>
+    <li><span class="t">CENet</span><span class="w">唯一正面处理非目标行人遮挡</span></li>
+    <li><span class="t">MOO</span><span class="w">视角依赖性量化的方法论模板</span></li>
+    <li><span class="t">Ning et al. 综述</span><span class="w">遮挡 Re-ID 的问题分类体系</span></li>
+  </ol>
+</section>
+
+<footer>
+  写作依据：逐篇提取标题页、摘要与实验节原文，基准数字均回溯原文核对。<br>
+  对应文件：<span style="color:var(--ink-2)">SoccerNet-v3_补充文献 / 2-方法论参考 / 00_综述_方法论参考文献.md</span>
+</footer>
+
+</main>
+</div>
+<a href="./" style="position:fixed;left:14px;bottom:calc(14px + env(safe-area-inset-bottom,0px));
+ z-index:99;font:500 12px/1 ui-monospace,SFMono-Regular,Menlo,monospace;text-decoration:none;
+ padding:9px 13px;border-radius:4px;border:1px solid rgba(128,140,130,.45);
+ background:rgba(250,250,248,.94);color:#22282a;backdrop-filter:blur(8px)">&larr; 目录</a>
+</body>
+</html>
