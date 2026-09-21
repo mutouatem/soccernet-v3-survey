@@ -1,0 +1,472 @@
+<!doctype html><html><head><meta name="robots" content="noindex, nofollow, noarchive"><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>v3 ReID 方法详解</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@700&family=Noto+Sans+SC:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --bg:#F6F8F5; --surface:#FFFFFF; --text:#1B1F1C; --muted:#5B655E; --line:#D9E0DA; --line-strong:#B9C4BC;
+  --accent:#1F6B45; --accent-ink:#14523A; --accent-soft:#E6F0E9; --amber:#8F6210; --amber-bg:#FBF3E1; --amber-line:#E8D5A3;
+  --code-bg:#EEF2EF; --shadow:0 1px 2px rgba(20,40,28,.06); --on-accent:#FFFFFF;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#0F1412; --surface:#161C18; --text:#E4EAE5; --muted:#9AA79E; --line:#27302A; --line-strong:#3A463E;
+  --accent:#5FBF8A; --accent-ink:#8ADBAE; --accent-soft:#1B2A21; --amber:#E4B04A; --amber-bg:#2A2313; --amber-line:#5A4A1E;
+  --code-bg:#1E2622; --shadow:none; --on-accent:#0F1412;
+}}
+:root[data-theme="dark"]{
+  --bg:#0F1412; --surface:#161C18; --text:#E4EAE5; --muted:#9AA79E; --line:#27302A; --line-strong:#3A463E;
+  --accent:#5FBF8A; --accent-ink:#8ADBAE; --accent-soft:#1B2A21; --amber:#E4B04A; --amber-bg:#2A2313; --amber-line:#5A4A1E;
+  --code-bg:#1E2622; --shadow:none; --on-accent:#0F1412;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:"Noto Sans SC","PingFang SC","Hiragino Sans GB","Microsoft YaHei",system-ui,sans-serif;font-size:15.5px;line-height:1.75;padding-block:0 96px;padding-inline:0}
+a{color:var(--accent-ink)}
+a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.shell{display:grid;grid-template-columns:248px minmax(0,1fr);gap:48px;max-width:1180px;margin:0 auto;padding-inline:24px}
+header.masthead{grid-column:1/-1;padding-block:48px 26px;border-bottom:1px solid var(--line)}
+.eyebrow{font-family:"IBM Plex Mono",ui-monospace,Menlo,monospace;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent-ink)}
+.back{display:inline-block;margin-bottom:18px;font-size:13.5px;text-decoration:none;border-bottom:1px solid var(--line-strong);padding-bottom:1px}
+.back:hover{border-color:var(--accent)}
+h1{font-family:"Noto Serif SC","Songti SC","SimSun",serif;font-weight:700;font-size:clamp(28px,4vw,42px);line-height:1.2;margin:10px 0 12px;text-wrap:balance}
+.lede{font-size:17px;color:var(--muted);max-width:66ch;margin:0 0 18px}
+.meta{display:flex;flex-wrap:wrap;gap:8px 22px;font-family:"IBM Plex Mono",ui-monospace,Menlo,monospace;font-size:12.5px;color:var(--muted)}
+.meta b{color:var(--text);font-weight:600}
+nav.toc{position:sticky;top:calc(20px + env(safe-area-inset-top, 0px));align-self:start;max-height:calc(100vh - 40px);overflow:auto;font-size:13.5px;padding-right:8px;scrollbar-width:thin;scrollbar-color:var(--line-strong) transparent}
+.toc-head{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:11.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
+.toc ol{list-style:none;margin:0;padding:0}
+.toc-l1>li{margin:0 0 6px}
+.toc-l1>li>a{font-weight:600;color:var(--text);text-decoration:none}
+.toc-l2{margin:4px 0 8px 10px!important;border-left:1px solid var(--line);padding-left:10px!important}
+.toc-l2 li{margin:2px 0}
+.toc-l2 a{color:var(--muted);text-decoration:none}
+.toc a:hover{color:var(--accent-ink)}
+main{min-width:0;max-width:780px}
+main>section{padding-block:36px 8px;border-bottom:1px solid var(--line)}
+main>section:last-of-type{border-bottom:0}
+h2{font-family:"Noto Serif SC","Songti SC",serif;font-size:27px;line-height:1.3;margin:0 0 18px;text-wrap:balance}
+h3{font-family:"Noto Serif SC","Songti SC",serif;font-size:20px;line-height:1.35;margin:36px 0 10px;text-wrap:balance}
+h3 .rank{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:12.5px;font-weight:500;color:var(--muted);margin-left:8px;white-space:nowrap}
+h4{font-size:16px;font-weight:700;margin:24px 0 8px}
+p{margin:0 0 14px}
+ul,ol{margin:0 0 14px;padding-left:22px}
+li{margin:4px 0}
+code{font-family:"IBM Plex Mono",ui-monospace,Menlo,monospace;font-size:.88em;background:var(--code-bg);padding:1px 5px;border-radius:3px}
+.pid{font-family:"IBM Plex Mono",ui-monospace,Menlo,monospace;font-size:.86em;background:var(--accent-soft);color:var(--accent-ink);padding:0 5px;border-radius:4px;white-space:nowrap}
+
+/* formula blocks: the chip states where the formula comes from */
+.eq{margin:14px 0 20px;background:var(--surface);border:1px solid var(--line);border-radius:6px;box-shadow:var(--shadow)}
+.eq-head{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;padding:7px 12px;border-bottom:1px solid var(--line);font-size:12.5px;color:var(--muted)}
+.eq-head .what{font-weight:500;color:var(--text)}
+.eq-body{padding:6px 14px;overflow-x:auto}
+.eq-note{padding:0 14px 10px;font-size:13.5px;color:var(--muted)}
+.src{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:11.5px;letter-spacing:.04em;padding:1px 8px;border-radius:999px;white-space:nowrap;border:1px solid transparent}
+.src-paper{background:var(--accent);color:var(--on-accent)}
+.src-std{border-color:var(--line-strong);color:var(--text)}
+.src-mine{background:var(--amber-bg);border-color:var(--amber-line);color:var(--amber)}
+.legend{display:grid;gap:10px;margin:0 0 8px;padding:0;list-style:none}
+.legend li{display:grid;grid-template-columns:92px 1fr;gap:12px;align-items:baseline;margin:0}
+.warn{margin:14px 0 18px;padding:10px 16px;border-left:3px solid var(--amber);background:var(--amber-bg);border-radius:0 6px 6px 0;font-size:14.5px}
+.warn b{color:var(--amber)}
+.said{margin:12px 0 14px;padding:10px 16px;border-left:3px solid var(--accent);background:var(--accent-soft);border-radius:0 6px 6px 0;font-size:14.5px}
+.said .lab{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--accent-ink);display:block;margin-bottom:2px}
+.tblwrap{overflow-x:auto;margin:14px 0 20px;border:1px solid var(--line);border-radius:6px;background:var(--surface);box-shadow:var(--shadow)}
+table{border-collapse:collapse;width:100%;font-size:13.5px;line-height:1.5}
+th,td{padding:8px 12px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-weight:600;color:var(--muted);font-size:12.5px;background:var(--code-bg);white-space:nowrap}
+tbody tr:last-child td{border-bottom:0}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums;font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:12.5px;white-space:nowrap}
+tr.hl td{background:var(--accent-soft);font-weight:600}
+.yes{color:var(--accent-ink);font-weight:600}.no{color:var(--amber);font-weight:600}
+footer.colophon{margin-top:40px;font-size:13px;color:var(--muted)}
+mjx-container{color:var(--text)}
+mjx-container[display="true"]{margin:.55em 0!important}
+@media (max-width:900px){
+  .shell{grid-template-columns:1fr;gap:0}
+  nav.toc{position:static;max-height:none;padding:16px 0 8px;border-bottom:1px solid var(--line)}
+  .toc-l2{display:none}
+}
+@media (max-width:520px){ body{font-size:15px} .shell{padding-inline:16px} .legend li{grid-template-columns:1fr;gap:2px} }
+@media (prefers-reduced-motion:reduce){ html{scroll-behavior:auto} }
+</style>
+<script>
+window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]},svg:{fontCache:'global'},options:{enableMenu:false}};
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-svg-full.min.js" async></script>
+
+<div class="shell">
+<header class="masthead">
+  <a class="back" href="index.html">← 返回文献工作台</a>　<a class="back" href="citations.html">跨视角球员重识别综述 →</a>
+  <div class="eyebrow">Companion notes · SoccerNet-v3 ReID</div>
+  <h1>v3 跨视角 ReID：三篇文献里的方法与公式</h1>
+  <p class="lede">把 RFES-ReID（#103）与 SoccerNet 2022 / 2023 两届挑战赛报告（#104、#56）里出现的每一个 re-ID 方法拆开讲，并把涉及的公式排出来。每个公式都标了出处：是论文原文、是组件的标准定义，还是我根据文字描述写出的形式化。</p>
+  <div class="meta"><span><b>3</b> 篇文献</span><span><b>9</b> 个 re-ID 方案</span><span>另含 TrackMerger v1 / v2</span><span>2026-09-21</span></div>
+</header>
+
+<nav class="toc" aria-label="目录">
+  <div class="toc-head">目录</div>
+  <ol class="toc-l1">
+    <li><a href="#read">读前说明</a></li>
+    <li><a href="#rfes">RFES-ReID（#103）</a>
+      <ol class="toc-l2">
+        <li><a href="#rfes-flow">整体流程</a></li>
+        <li><a href="#rfes-swin">Swin 回顾（Eq. 1–3）</a></li>
+        <li><a href="#rfes-rfeb">RFEB</a></li>
+        <li><a href="#rfes-loss">融合损失（Eq. 4–7）</a></li>
+        <li><a href="#rfes-rerank">k-reciprocal 重排序</a></li>
+        <li><a href="#rfes-res">设置与结果</a></li>
+      </ol></li>
+    <li><a href="#c22">2022 挑战赛（#104）</a>
+      <ol class="toc-l2">
+        <li><a href="#c22-board">任务与排行榜</a></li>
+        <li><a href="#c22-r1">R1 Inspur</a></li>
+        <li><a href="#c22-r2">R2 MGSoccer-ViT</a></li>
+        <li><a href="#c22-r3">R3 MTVACV</a></li>
+        <li><a href="#c22-r4">R4 Sports Re-ID</a></li>
+        <li><a href="#c22-r5">R5 MIG</a></li>
+        <li><a href="#c22-r7">R7 ReBatch</a></li>
+        <li><a href="#c22-tm">TrackMerger</a></li>
+        <li><a href="#c22-seven">组织者的七条经验</a></li>
+      </ol></li>
+    <li><a href="#c23">2023 挑战赛（#56）</a>
+      <ol class="toc-l2">
+        <li><a href="#c23-board">排行榜</a></li>
+        <li><a href="#c23-clip">CLIP-ReIdent</a></li>
+        <li><a href="#c23-tm">TrackMerger v2</a></li>
+        <li><a href="#c23-j2">号码识别里的 v3 图像</a></li>
+      </ol></li>
+    <li><a href="#parts">部件对照：能拿什么</a></li>
+  </ol>
+</nav>
+
+<main>
+
+<section id="read">
+<h2>读前说明</h2>
+<p>两篇挑战赛报告里，每个方法只有一段文字摘要，<strong>报告本身没有任何公式，也没有超参数</strong>。RFES-ReID 是正式论文，有编号公式 Eq. 1–7。所以本页的公式有三种来源，用色标区分：</p>
+<ul class="legend">
+  <li><span><span class="src src-paper">原文</span></span><span>论文里有编号的公式，我回原文逐条对过。只出现在 RFES-ReID 一节。</span></li>
+  <li><span><span class="src src-std">标准定义</span></span><span>报告只说"用了 ArcFace / InfoNCE / DINO…"，这里给的是该组件在其原始论文中的通行写法。参赛队的具体取值与改动，报告没写。</span></li>
+  <li><span><span class="src src-mine">我的形式化</span></span><span>原文只有文字或示意图，公式是我按描述写出来的；属于推断，引用前请自行核对。</span></li>
+</ul>
+<p>范围：re-ID 任务的全部方法，加上与身份直接相关的跟踪冠军 TrackMerger。动作定位、标定、字幕等任务不在本页。文中 <span class="pid">#编号</span> 与<a href="citations.html#index">综述的论文索引</a>一致。</p>
+</section>
+
+<section id="rfes">
+<h2>一、RFES-ReID（#103）</h2>
+<p>Akan, Varlı, Bhuiyan. <em>An enhanced Swin Transformer for soccer player reidentification.</em> Scientific Reports 14:1139 (2024)。语料里唯一在 SoccerNet-v3 跨视角 re-ID 数据上做方法研究的论文。</p>
+
+<h3 id="rfes-flow">整体流程</h3>
+<ul>
+  <li><strong>训练</strong>：图像 → RFES 骨干 → 特征 → 三个损失相加。</li>
+  <li><strong>推理</strong>：图像 → 骨干 → 特征 → 初始排序 → k-reciprocal 重排序。</li>
+  <li>骨干是 Swin-T，四个 stage 的 block 数为 2 / 2 / 6 / 2，输入 224×224，窗口按 4×4 网格划分。</li>
+</ul>
+
+<h3 id="rfes-swin">Swin Transformer 回顾</h3>
+<p>把 \(H\times W\times C\) 的特征切成互不重叠的 \(M\times M\) 窗口，每个窗口内各自做自注意力。对一个窗口的特征 \(X\in\mathbb{R}^{M^2\times C}\)：</p>
+<div class="eq"><div class="eq-head"><span class="src src-paper">原文 Eq. 1</span><span class="what">窗口内的 Q / K / V</span></div>
+<div class="eq-body">\[ Q = XP_Q,\qquad K = XP_K,\qquad V = XP_V \]</div>
+<div class="eq-note">\(P_Q, P_K, P_V\) 在所有窗口之间共享；\(Q,K,V\in\mathbb{R}^{M^2\times d}\)。</div></div>
+
+<div class="eq"><div class="eq-head"><span class="src src-paper">原文 Eq. 2</span><span class="what">带相对位置偏置的窗口注意力</span></div>
+<div class="eq-body">\[ \mathrm{Attention}(Q,K,V)=\mathrm{SoftMax}\!\left(\frac{QK^{\top}}{\sqrt{d}}+B\right)V \]</div>
+<div class="eq-note">\(B\) 是可学习的相对位置编码。</div></div>
+
+<p>窗口划分如果每层都一样，窗口之间就没有信息交换。Swin 的做法是相邻两个 block 交替使用规则窗口（W-MSA）与平移了 \((M/2, M/2)\) 的窗口（SW-MSA）：</p>
+<div class="eq"><div class="eq-head"><span class="src src-paper">原文 Eq. 3</span><span class="what">连续两个 Swin block</span></div>
+<div class="eq-body">\[ \begin{aligned}
+\hat X^{l} &amp;= \text{W-MSA}\big(\mathrm{LN}(X^{l-1})\big) + X^{l-1}\\
+X^{l} &amp;= \mathrm{MLP}\big(\mathrm{LN}(\hat X^{l})\big) + \hat X^{l}\\
+\hat X^{l+1} &amp;= \text{SW-MSA}\big(\mathrm{LN}(X^{l})\big) + X^{l}\\
+X^{l+1} &amp;= \mathrm{MLP}\big(\mathrm{LN}(\hat X^{l+1})\big) + \hat X^{l+1}
+\end{aligned} \]</div>
+<div class="eq-note">LN 为 LayerNorm；MLP 是两层全连接，中间夹 GELU。</div></div>
+
+<h3 id="rfes-rfeb">Regional Feature Extraction Block（论文的核心改动）</h3>
+<p>动机：位置编码加窗口注意力，对局部相关性和空间结构的编码不够；球员缩略图又小又糊，纯 attention 抓不住细节。做法是在每个 stage 的 Swin block 之前插入一个空洞卷积残差分支，给 Transformer 补上 CNN 式的局部感受野。原文只有文字和 Fig. 6，按它的描述写出来是：</p>
+<div class="eq"><div class="eq-head"><span class="src src-mine">我的形式化</span><span class="what">RFEB：token → 特征图 → 空洞卷积残差 → token</span></div>
+<div class="eq-body">\[ \begin{aligned}
+F &amp;= \mathrm{reshape}(X) &amp;&amp; (B,\,HW,\,C)\rightarrow(B,\,C,\,H,\,W)\\
+F' &amp;= F + \mathrm{GELU}\big(\mathrm{DConv}_{3\times3}^{\,r=2}(F)\big)\\
+X' &amp;= \mathrm{reshape}(F') &amp;&amp; (B,\,C,\,H,\,W)\rightarrow(B,\,HW,\,C)
+\end{aligned} \]</div>
+<div class="eq-note">\(r\) 是空洞率（dilation）。\(X'\) 送入后面的 Swin block。</div></div>
+
+<div class="warn"><b>原文的一处错误。</b>论文说 3×3、dilation=2 的卷积"有 7×7 的感受野"。按等效核公式算，实际是 5×5。7×7 是"先 1-dilated、再 2-dilated 两层堆叠"的结果，出自空洞卷积的原始论文，疑似误引。不影响实验，但引用时别照抄。</div>
+<div class="eq"><div class="eq-head"><span class="src src-std">标准定义</span><span class="what">空洞卷积的等效核大小</span></div>
+<div class="eq-body">\[ k_{\text{eff}} = k + (k-1)(r-1) = 3 + 2\times 1 = 5 \]</div></div>
+
+<h3 id="rfes-loss">融合损失</h3>
+<div class="eq"><div class="eq-head"><span class="src src-paper">原文 Eq. 4</span><span class="what">交叉熵：保证分类正确</span></div>
+<div class="eq-body">\[ L_{CE}(p_i, y_i) = -\,y_i \log p_i \]</div>
+<div class="eq-note">\(p_i\) 是第 \(i\) 个样本的预测概率，\(y_i\) 是真实标签。</div></div>
+
+<div class="eq"><div class="eq-head"><span class="src src-paper">原文 Eq. 5</span><span class="what">Triplet：同一个人拉近，不同的人推远</span></div>
+<div class="eq-body">\[ L_T = \max\big(d_{a,p} - d_{a,n} + \mathrm{margin},\; 0\big) \]</div>
+<div class="eq-note">\(d\) 为欧氏距离，margin = 0.3。原文没说怎样挖掘三元组；batch 是 8 个身份 × 每个 4 张，通常意味着 batch-hard 挖掘（我的推断）。</div></div>
+
+<div class="eq"><div class="eq-head"><span class="src src-paper">原文 Eq. 6</span><span class="what">Focal：把梯度让给难样本</span></div>
+<div class="eq-body">\[ L_F = \sum_{i=1}^{n} (1-p_i)^{\gamma}\, L_{CE}(p_i, y_i) \]</div>
+<div class="eq-note">\(\gamma=2\)，在 SoccerNet-v3 上扫参选出（Fig. 9），但论文没说用的是哪个 split。已经分得很对的样本（\(p\to1\)）几乎不贡献损失。v3 里每个身份只有几张图、同队球员互为难负样本，这一项就是为此加的。</div></div>
+
+<div class="eq"><div class="eq-head"><span class="src src-paper">原文 Eq. 7</span><span class="what">三项等权相加</span></div>
+<div class="eq-body">\[ L_{Fusion} = L_{CE} + L_T + L_F \]</div></div>
+
+<h3 id="rfes-rerank">k-reciprocal 重排序</h3>
+<p>原文只有文字描述，并说参数沿用原论文（Zhong et al., CVPR 2017）。直观含义：如果 A 的近邻里有 B、B 的近邻里也有 A，而且两人的"近邻圈"高度重合，那它们更可能是同一个人。</p>
+<div class="eq"><div class="eq-head"><span class="src src-std">标准定义</span><span class="what">第一步：互为 k 近邻的集合</span></div>
+<div class="eq-body">\[ \mathcal{R}(p,k) = \big\{\, g \;:\; g\in N(p,k)\ \wedge\ p\in N(g,k) \,\big\} \]</div>
+<div class="eq-note">\(N(p,k)\) 是 \(p\) 的前 \(k\) 个近邻。</div></div>
+<div class="eq"><div class="eq-head"><span class="src src-std">标准定义</span><span class="what">第二步：扩展集合</span></div>
+<div class="eq-body">\[ \mathcal{R}^{*}(p,k) \leftarrow \mathcal{R}(p,k)\,\cup\,\mathcal{R}\big(q,\tfrac{k}{2}\big)\quad \text{if}\quad \Big|\mathcal{R}(p,k)\cap\mathcal{R}\big(q,\tfrac{k}{2}\big)\Big| \ \ge\ \tfrac{2}{3}\,\Big|\mathcal{R}\big(q,\tfrac{k}{2}\big)\Big|,\qquad \forall q\in\mathcal{R}(p,k) \]</div></div>
+<div class="eq"><div class="eq-head"><span class="src src-std">标准定义</span><span class="what">第三步：编码成向量，并用近邻做局部扩展</span></div>
+<div class="eq-body">\[ V_{p,g} = \begin{cases} e^{-d(p,g)} &amp; g\in\mathcal{R}^{*}(p,k)\\[2pt] 0 &amp; \text{otherwise} \end{cases} \qquad\qquad V_p \leftarrow \frac{1}{|N(p,k_2)|}\sum_{g\in N(p,k_2)} V_g \]</div></div>
+<div class="eq"><div class="eq-head"><span class="src src-std">标准定义</span><span class="what">第四步：Jaccard 距离与原始距离加权</span></div>
+<div class="eq-body">\[ d_J(p,g) = 1 - \frac{\sum_{j}\min\big(V_{p,j},\,V_{g,j}\big)}{\sum_{j}\max\big(V_{p,j},\,V_{g,j}\big)} \qquad\qquad d^{*}(p,g) = (1-\lambda)\,d_J(p,g) + \lambda\, d(p,g) \]</div>
+<div class="eq-note">原论文默认 \(k_1=20,\ k_2=6,\ \lambda=0.3\)。RFES-ReID 原文把第二项写成"Manhalanobis distance"，应是马氏距离的拼写错误。</div></div>
+<div class="warn"><b>复现时要自己验证的一点。</b>按我的粗略估算，每个 action 的 gallery 只有 20 张左右，\(k_1=20\) 几乎覆盖整个 action，真正起作用的是"互为近邻"这个条件。论文没说重排序是按 action 做还是全局做。</div>
+
+<h3 id="rfes-res">设置与结果</h3>
+<ul>
+  <li><strong>数据</strong>：只用 train split（248,234 个样本）训练，在 test split 上评测：query 11,777 张、gallery 34,989 张；身份只在 action 内有效，query 只与同一 action 的 gallery 比较。</li>
+  <li><strong>预处理</strong>：删掉训练集中少于 4 张图的身份；随机水平翻转、随机裁剪、random erasing。</li>
+  <li><strong>优化</strong>：AdamW，lr 1e-3，weight decay 0.05，cosine 衰减 + 10 epoch 线性 warm-up，共 120 epoch；单张 RTX 4080。</li>
+</ul>
+<div class="tblwrap"><table>
+<thead><tr><th>配置（Table 1，SoccerNet-v3 test）</th><th class="num">Rank-1</th><th class="num">mAP</th></tr></thead>
+<tbody>
+<tr><td>Swin-T 基线</td><td class="num">75.34</td><td class="num">80.16</td></tr>
+<tr><td>+ RFEB</td><td class="num">79.63</td><td class="num">81.39</td></tr>
+<tr><td>+ 融合损失</td><td class="num">81.8</td><td class="num">85.0</td></tr>
+<tr class="hl"><td>+ 重排序</td><td class="num">84.1</td><td class="num">86.7</td></tr>
+</tbody></table></div>
+<div class="tblwrap"><table>
+<thead><tr><th>损失组合（Table 2）</th><th class="num">Rank-1</th><th class="num">mAP</th></tr></thead>
+<tbody>
+<tr><td>CE</td><td class="num">74.63</td><td class="num">78.96</td></tr>
+<tr><td>Triplet</td><td class="num">79.63</td><td class="num">81.39</td></tr>
+<tr><td>Focal</td><td class="num">80.06</td><td class="num">84.25</td></tr>
+<tr><td>CE + Triplet</td><td class="num">79.87</td><td class="num">82.54</td></tr>
+<tr><td>CE + Focal</td><td class="num">80.45</td><td class="num">84.58</td></tr>
+<tr><td>Triplet + Focal</td><td class="num">80.92</td><td class="num">84.71</td></tr>
+<tr class="hl"><td>三项融合</td><td class="num">81.8</td><td class="num">85.0</td></tr>
+</tbody></table></div>
+<p>单看一项，focal 的 mAP 比 CE 高 5.3 个点，是三项里贡献最大的；这与 2022 冠军 Inspur 的经验一致。</p>
+<div class="tblwrap"><table>
+<thead><tr><th>对比方法（Table 4）</th><th>骨干</th><th class="num">Rank-1</th><th class="num">mAP</th></tr></thead>
+<tbody>
+<tr><td>ResNet50</td><td>CNN</td><td class="num">48.4</td><td class="num">59.1</td></tr>
+<tr><td>OSNet</td><td>CNN</td><td class="num">69.2</td><td class="num">76.4</td></tr>
+<tr><td>Baseline</td><td>ViT-B/16</td><td class="num">68.2</td><td class="num">75.7</td></tr>
+<tr><td>TransReID</td><td>ViT-B/16</td><td class="num">68.6</td><td class="num">77.2</td></tr>
+<tr><td>Baseline</td><td>DeiT-B/16</td><td class="num">65.0</td><td class="num">73.2</td></tr>
+<tr><td>TransReID</td><td>DeiT-B/16</td><td class="num">65.4</td><td class="num">74.6</td></tr>
+<tr><td>TransReID-SSL</td><td>ViT-S/16</td><td class="num">83.8</td><td class="num">80.1</td></tr>
+<tr><td>Sports Re-ID（Comandur）</td><td>ViT-S/16</td><td class="num">81.5</td><td class="num">86.0</td></tr>
+<tr><td>Baseline</td><td>Swin-T</td><td class="num">75.3</td><td class="num">80.2</td></tr>
+<tr><td>RFES-ReID，无重排序</td><td>Swin-T</td><td class="num">81.8</td><td class="num">85.0</td></tr>
+<tr class="hl"><td>RFES-ReID，有重排序</td><td>Swin-T</td><td class="num">84.1</td><td class="num">86.7</td></tr>
+</tbody></table></div>
+<div class="warn"><b>读这张表要留意。</b>各对比行是自行复现还是转引，论文没说；ResNet50 一行的 48.4 / 59.1 与 2022 挑战赛 challenge 集官方 baseline（Rank-1 48.41 / mAP 59.11）数值相同，疑似混用了不同 split（我的推断）。正文称融合损失在 Market-1501 上为 95.10 / 86.97，Table 1 却是 95.7 / 87.3。方法对视角变化没有任何设计，作者把 perspective difference 留作未来工作；全部单帧；代码需向作者索取。</div>
+</section>
+
+<section id="c22">
+<h2>二、SoccerNet 2022 挑战赛（#104）</h2>
+<p>Giancola et al. <em>SoccerNet 2022 Challenges Results.</em> MMSports '22。6 个任务共 67 队、637 次提交；re-ID 是首届。</p>
+
+<h3 id="c22-board">任务与排行榜</h3>
+<ul>
+  <li><strong>任务</strong>：在比赛某一时刻的某个 action 内，跨多个相机视角重识别球员与裁判。</li>
+  <li><strong>数据</strong>：SoccerNet-v3 ReID，340,993 张缩略图，400 场、6 大联赛；分 train / valid / test / challenge，按 challenge 集 mAP 排名。</li>
+  <li><strong>组织者认定的难点</strong>：同队外观几乎一样；每个身份只有几张图；分辨率差异大。</li>
+</ul>
+<div class="tblwrap"><table>
+<thead><tr><th>名次</th><th>队伍</th><th class="num">mAP</th><th class="num">Rank-1</th><th>有方法摘要</th></tr></thead>
+<tbody>
+<tr class="hl"><td>1</td><td>Inspur</td><td class="num">91.68</td><td class="num">89.41</td><td class="yes">R1</td></tr>
+<tr><td>2</td><td>MGSoccer（腾讯）</td><td class="num">91.48</td><td class="num">89.21</td><td class="yes">R2</td></tr>
+<tr><td>3</td><td>MTVACV（美团）</td><td class="num">90.11</td><td class="num">87.04</td><td class="yes">R3</td></tr>
+<tr><td>4</td><td>gunners（Comandur）</td><td class="num">89.47</td><td class="num">86.42</td><td class="yes">R4</td></tr>
+<tr><td>5</td><td>MIG</td><td class="num">89.44</td><td class="num">86.11</td><td class="yes">R5</td></tr>
+<tr><td>6</td><td>MMLab</td><td class="num">89.01</td><td class="num">85.68</td><td>无</td></tr>
+<tr><td>7</td><td>ReBatch</td><td class="num">88.36</td><td class="num">84.82</td><td class="yes">R7</td></tr>
+<tr><td>8</td><td>tianchao</td><td class="num">87.39</td><td class="num">84.25</td><td>无</td></tr>
+<tr><td>9</td><td>126_187</td><td class="num">86.96</td><td class="num">83.04</td><td>无</td></tr>
+<tr><td>10</td><td>Blackghost</td><td class="num">78.25</td><td class="num">71.50</td><td>无</td></tr>
+<tr><td>11</td><td>1234567</td><td class="num">65.98</td><td class="num">58.40</td><td>无</td></tr>
+<tr><td>12</td><td>rasengan</td><td class="num">64.79</td><td class="num">54.27</td><td>无</td></tr>
+<tr><td>13</td><td>baba</td><td class="num">60.32</td><td class="num">48.91</td><td>无</td></tr>
+<tr><td>—</td><td>官方 baseline（sn-reid）</td><td class="num">59.11</td><td class="num">48.41</td><td>仅给仓库地址</td></tr>
+</tbody></table></div>
+<p>官方 baseline 报告里没有描述方法。按我对 <code>SoccerNet/sn-reid</code> 仓库的印象，它基于 torchreid，ResNet-50 加 softmax 分类损失——这一条在语料之外，需自行核实。</p>
+
+<h3 id="c22-r1">R1 Inspur <span class="rank">冠军 · mAP 91.68</span></h3>
+<div class="said"><span class="lab">报告里说了什么</span>主要难点是样本不均衡，以及多输入分辨率带来的不鲁棒。删掉少于 3 张图的身份，用 focal loss；骨干选 ResNeSt269，分类头为 Arc-Softmax 与 Cos-Softmax 的组合；AutoAug、ColorJitter、RandomErase，概率均为 0.5；单模型调好后叠加常用技巧：多输入分辨率模型融合、加入测试阶段数据、无监督域自适应。</div>
+<div class="eq"><div class="eq-head"><span class="src src-std">标准定义</span><span class="what">Focal loss（Lin et al.）</span></div>
+<div class="eq-body">\[ L_{focal} = -\,(1-p_t)^{\gamma}\,\log p_t \]</div>
+<div class="eq-note">\(p_t\) 是真实类别的预测概率。</div></div>
+<div class="eq"><div class="eq-head"><span class="src src-std">标准定义</span><span class="what">ArcFace（Arc-Softmax）：在角度上加 margin</span></div>
+<div class="eq-body">\[ L_{arc} = -\log\frac{e^{\,s\cos(\theta_{y}+m)}}{e^{\,s\cos(\theta_{y}+m)}+\sum_{j\ne y} e^{\,s\cos\theta_j}} \]</div></div>
+<div class="eq"><div class="eq-head"><span class="src src-std">标准定义</span><span class="what">CosFace（Cos-Softmax）：在余弦值上减 margin</span></div>
+<div class="eq-body">\[ L_{cos} = -\log\frac{e^{\,s(\cos\theta_{y}-m)}}{e^{\,s(\cos\theta_{y}-m)}+\sum_{j\ne y} e^{\,s\cos\theta_j}} \]</div>
+<div class="eq-note">\(\theta_j\) 是 L2 归一化特征与第 \(j\) 类权重向量的夹角，\(s\) 为缩放，\(m\) 为 margin。两者都让同一个人的特征在超球面上聚得更紧。</div></div>
+<ul>
+  <li><strong>ResNeSt</strong>：把通道分组，组内做 split-attention（用全局池化得到的权重对各个 split 加权求和）；269 是层数规格。</li>
+  <li><strong>多分辨率融合</strong>：报告没给做法。常见做法是训练几个输入尺寸不同的模型，再拼接特征或平均距离矩阵。针对的正是"分辨率差异大"。</li>
+  <li><strong>无监督域自适应</strong>：报告没说用哪种方法。re-ID 里的典型流程是：用已训好的模型给目标集提特征 → 聚类（如 DBSCAN）得伪标签 → 用伪标签微调 → 重复。</li>
+</ul>
+<div class="warn"><b>这一条决定了成绩能不能拿来对比。</b>"加入测试阶段数据 + 域自适应"意味着冠军成绩用到了 challenge 集的无标签图像。方法论文里一般不接受这样做。</div>
+
+<h3 id="c22-r2">R2 MGSoccer-ViT <span class="rank">腾讯 · 91.48（test 91.28）</span></h3>
+<div class="said"><span class="lab">报告里说了什么</span>CNN 与 ViT 两路分别表示球员图像。CNN 按 Multiple Granularity Network 设计，用独立分支表示全局与不同粒度的局部特征；ViT 参照 TransReID，把图像切成等大的 patch 作为 token 序列。所有骨干用 LUPerson 上的自监督预训练初始化。ArcFace + hard triplet。针对 SoccerNet 的分布，删掉所有长尾身份，并用 action-based sampler 在不同 action 中采等量身份。增强：翻转、擦除、padding 后裁剪、AutoAugment、AugMix。</div>
+<div class="eq"><div class="eq-head"><span class="src src-std">标准定义</span><span class="what">MGN：三个分支的特征拼接</span></div>
+<div class="eq-body">\[ f = \big[\, f^{G}_{g},\; f^{P2}_{g},\; f^{P3}_{g},\; f^{P2}_{1}, f^{P2}_{2},\; f^{P3}_{1}, f^{P3}_{2}, f^{P3}_{3} \,\big] \]</div>
+<div class="eq-note">ResNet 后半段分三支：全局分支 G；把特征图横切成 2 条的 P2；横切成 3 条的 P3。每支有一个全局向量 \(f_g\)，局部分支另有各条的向量。原论文里全局向量用 triplet，各局部向量用分类损失。</div></div>
+<div class="eq"><div class="eq-head"><span class="src src-std">标准定义</span><span class="what">TransReID / ViT 的输入序列</span></div>
+<div class="eq-body">\[ Z_0 = \big[\, x_{cls};\ \mathcal{E}(x_1);\ \mathcal{E}(x_2);\ \dots;\ \mathcal{E}(x_N) \,\big] + \mathcal{P} \]</div>
+<div class="eq-note">\(\mathcal{E}\) 是 patch 的线性映射，\(\mathcal{P}\) 是位置编码。TransReID 原论文还有 JPM 与 SIE 两个模块，报告没说是否使用。</div></div>
+<div class="eq"><div class="eq-head"><span class="src src-std">标准定义</span><span class="what">Batch-hard triplet</span></div>
+<div class="eq-body">\[ L_{BH} = \sum_{a}\Big[\, m + \max_{p:\,y_p=y_a} d(a,p)\ -\ \min_{n:\,y_n\ne y_a} d(a,n) \,\Big]_{+} \]</div>
+<div class="eq-note">每个 anchor 取 batch 内最远的正样本和最近的负样本。</div></div>
+<p><strong>LUPerson</strong> 是约 400 万张无标签行人图的数据集。它是唯一同时报告 test 与 challenge 成绩的队，从它看两个 split 难度接近。</p>
+
+<h3 id="c22-r3">R3 MTVACV <span class="rank">美团 · 90.11</span></h3>
+<div class="said"><span class="lab">报告里说了什么</span>难点是球员外观高度相似，以及球员之间严重的相互遮挡。① 面向目标域的自监督预训练：筛选 LUPerson，保留对 SoccerNet ReID 的 Catastrophic Forgetting Score 高的图像作为预训练集，用 DINO 训练 ViT-B。② 设计"可见性与重要性感知"的特征学习框架，提取不同身体部位的判别特征。③ 模型融合：直接平均不同模型的距离矩阵。</div>
+<div class="eq"><div class="eq-head"><span class="src src-std">标准定义</span><span class="what">DINO：学生匹配教师，教师是学生的滑动平均</span></div>
+<div class="eq-body">\[ \begin{aligned}
+P_s(x) &amp;= \mathrm{softmax}\big(g_{\theta_s}(x)/\tau_s\big), \qquad P_t(x) = \mathrm{softmax}\big((g_{\theta_t}(x)-c)/\tau_t\big)\\[4pt]
+L &amp;= -\sum_{x\in\{x^{g}_{1},x^{g}_{2}\}}\ \sum_{x'\in V,\ x'\ne x} P_t(x)^{\top}\log P_s(x')\\[4pt]
+\theta_t &amp;\leftarrow \lambda\,\theta_t + (1-\lambda)\,\theta_s, \qquad c \leftarrow m\,c + (1-m)\,\tfrac{1}{B}\textstyle\sum_{i} g_{\theta_t}(x_i)
+\end{aligned} \]</div>
+<div class="eq-note">\(V\) 是同一张图的多个裁剪视图，\(x^g\) 是其中的全局视图；减中心 \(c\) 与更低的 \(\tau_t\)（锐化）共同防止坍塌。不需要标签。</div></div>
+<div class="eq"><div class="eq-head"><span class="src src-mine">我的形式化</span><span class="what">可见性感知的部件距离（同类方法 BPBReID / PRTreID 的形式）</span></div>
+<div class="eq-body">\[ d(q,g) = \frac{\sum_{k} v^{q}_{k}\, v^{g}_{k}\ \big\lVert f^{q}_{k}-f^{g}_{k}\big\rVert}{\sum_{k} v^{q}_{k}\, v^{g}_{k}} \]</div>
+<div class="eq-note">\(v_k\) 是第 \(k\) 个部位的可见性，只对双方都可见的部位求平均。报告只有一句话、没有公式；"重要性"应是再给每个部位一个可学习权重。</div></div>
+<div class="eq"><div class="eq-head"><span class="src src-std">标准定义</span><span class="what">距离矩阵平均</span></div>
+<div class="eq-body">\[ D = \frac{1}{M}\sum_{m=1}^{M} D_m \]</div></div>
+<p><strong>CFS</strong> 出自 TransReID-SSL 论文，用来衡量预训练数据与下游数据的域差距。它的精确公式我没有把握，这里不写，要用时请查原论文。</p>
+
+<h3 id="c22-r4">R4 gunners / Sports Re-ID <span class="rank">Comandur · 89.47</span></h3>
+<div class="said"><span class="lab">报告里说了什么</span>不用随机采样，而用一种新的流程为每个 batch 选样本；用带 centroid 的损失更好地分开 embedding；最后做 model soup 进一步提高 mAP。模型只用 ImageNet 预训练。</div>
+<div class="eq"><div class="eq-head"><span class="src src-mine">我的形式化</span><span class="what">Centroid triplet 的通用形式</span></div>
+<div class="eq-body">\[ c_{P} = \frac{1}{|P|}\sum_{i\in P} f(x_i), \qquad L = \Big[\, \lVert f(a)-c_{P}\rVert - \lVert f(a)-c_{N}\rVert + m \,\Big]_{+} \]</div>
+<div class="eq-note">\(c_P\)、\(c_N\) 是正、负身份的特征均值。他实际用的形式要看独立论文（arXiv 2206 开头，不在语料里）。</div></div>
+<div class="eq"><div class="eq-head"><span class="src src-std">标准定义</span><span class="what">Model soup：对权重取平均，不是对预测取平均</span></div>
+<div class="eq-body">\[ \theta_{soup} = \frac{1}{M}\sum_{m=1}^{M}\theta_m \]</div>
+<div class="eq-note">推理时只跑一个模型，没有集成的开销。</div></div>
+<p>它是前几名里最省的配方：不用 LUPerson，不用集成。"分层采样"大概是按"比赛 → action → 身份"逐层抽样（我的推断）。</p>
+
+<h3 id="c22-r5">R5 MIG <span class="rank">89.44</span></h3>
+<div class="said"><span class="lab">报告里说了什么</span>改进经典采样策略：随机取 A 个 action、I 个身份、每身份 K 张图，得到 A×I×K 的 batch；action 总数很大加上随机性，可以避免同一球员的不同身份出现在同一 batch。batch 内用非参数 InfoNCE。骨干是 TransReID-SSL 里带 ICS 的 ViT。基于 Transformer 的自注意力提出一种特征融合方法，为原始 query 特征生成精炼特征。5 个模型（输入尺寸与预训练不同）集成生成最终距离矩阵。</div>
+<div class="warn"><b>这是整份报告里对你最有用的一句话。</b>v3 的身份只在 action 内有效，同一个人在另一个 action 里是另一个 ID。如果同场比赛的几个 action 进了同一 batch，这个人会被当成自己的负样本。任何在 v3 上训练的对比/度量学习都要处理这个假负样本问题。</div>
+<div class="eq"><div class="eq-head"><span class="src src-std">标准定义</span><span class="what">batch 内的非参数 InfoNCE（多正样本形式）</span></div>
+<div class="eq-body">\[ L_i = -\log\frac{\sum_{p\in P(i)} \exp\big(z_i^{\top} z_p/\tau\big)}{\sum_{k\ne i} \exp\big(z_i^{\top} z_k/\tau\big)} \]</div>
+<div class="eq-note">\(z\) 为 L2 归一化特征，\(P(i)\) 是 batch 内与 \(i\) 同身份的样本。"非参数"指没有分类层权重。v3 身份数极多、每身份只有几张，分类头很难学，这一点对它特别合适。</div></div>
+<div class="eq"><div class="eq-head"><span class="src src-mine">我的形式化</span><span class="what">基于注意力的 query 精炼（报告没给公式）</span></div>
+<div class="eq-body">\[ q' = q + \sum_{j}\mathrm{softmax}_j\!\Big(\frac{q^{\top} g_j}{\sqrt d}\Big)\, g_j \]</div>
+<div class="eq-note">让 query 从候选特征里聚合信息，作用类似重排序里的 query expansion。</div></div>
+<p><strong>ICS</strong>：用带 IBN 的卷积 stem 替换 ViT 的线性 patch embedding，训练更稳定。</p>
+
+<h3 id="c22-r7">R7 ReBatch <span class="rank">88.36</span></h3>
+<div class="said"><span class="lab">报告里说了什么</span>RE(s)IDnet 是以 ResNet 变体为骨干的模型集成。单个模型用欧氏 triplet 损失与 ID/分类损失的加权和，后者占比很小。同一 action 的图像放在同一 batch，以保证用到最好、最难的三元组。循环学习率，从 warm-up 周期开始。预处理用 coarse dropout 等增强。后处理改变 gallery 排名：如果所有模型都认为某张图是某个 query 的第一名，就在其它所有 query 的排名里把这张图后移。</div>
+<div class="eq"><div class="eq-head"><span class="src src-mine">我的形式化</span><span class="what">损失</span></div>
+<div class="eq-body">\[ L = L_{triplet} + \lambda\, L_{ID}, \qquad \lambda \ll 1 \]</div></div>
+<div class="eq"><div class="eq-head"><span class="src src-mine">我的形式化</span><span class="what">排名互斥后处理</span></div>
+<div class="eq-body">\[ \text{if}\ \ \forall m:\ \arg\min_{g} D_m(q,g) = g^{*}\quad\Longrightarrow\quad \forall q'\ne q:\ \text{demote } g^{*} \text{ in the ranking of } q' \]</div>
+<div class="eq-note">利用的事实是：同一 action 里，一张 gallery 图只属于一个人。可以看成贪心版的分配问题；升级版是在 action 内做二分图匹配，代价里再加球场坐标距离。</div></div>
+
+<h3 id="c22-tm">跟踪冠军 TrackMerger <span class="rank">Kalisteo · HOTA 93.64 / AssA 88.06</span></h3>
+<p>这一届提供全部真值检测框，只评关联（baseline HOTA 70.89）。</p>
+<ol>
+  <li><strong>逐帧生成短轨迹</strong>：检测与已有轨迹用匈牙利算法匹配，准则是框的 IoU 与中心距。报告没写两个准则怎样组合。</li>
+  <li><strong>自监督微调 re-ID 网络</strong>：正样本取自与 anchor 同一条轨迹，负样本取自与 anchor 同时存在的其它轨迹——同一帧里的两个框必然不是同一个人。</li>
+  <li><strong>合并轨迹</strong>：按 re-ID 向量距离合并，并禁止同帧重复身份、禁止相邻帧"瞬移"。</li>
+</ol>
+<div class="eq"><div class="eq-head"><span class="src src-mine">我的形式化</span><span class="what">轨迹自监督 triplet 的取样规则</span></div>
+<div class="eq-body">\[ L = \big[\, d(a,p) - d(a,n) + m \,\big]_{+},\qquad p\in \mathcal{T}(a),\qquad n\in \mathcal{T}'\ \ \text{with}\ \ \mathcal{T}'\ne\mathcal{T}(a),\ \ \mathrm{frames}(\mathcal{T}')\cap\mathrm{frames}(\mathcal{T}(a))\ne\varnothing \]</div>
+<div class="eq-note">\(\mathcal{T}(a)\) 是 anchor 所在的轨迹。不需要任何人工标注。</div></div>
+
+<h3 id="c22-seven">组织者总结的七条共性经验</h3>
+<ol>
+  <li>预处理：删掉训练集中样本太少的身份。</li>
+  <li>利用 action id、game id 等额外标签，手工设计 batch 采样策略。</li>
+  <li>常规增强：水平翻转、Random Erasing、随机裁剪、AutoAugment、AugMix、Color Jitter。</li>
+  <li>用强基线：TransReID-SSL（ViT 骨干 + LUPerson 无监督预训练）。</li>
+  <li>特定的度量学习损失：Focal、自定义 Centroid、InfoNCE、ArcFace。</li>
+  <li>在 challenge 集上做推理期的无监督域自适应微调。</li>
+  <li>推理时融合多个模型的预测来计算最终距离。</li>
+</ol>
+</section>
+
+<section id="c23">
+<h2>三、SoccerNet 2023 挑战赛（#56）</h2>
+<p>Cioppa et al. <em>SoccerNet 2023 challenges results.</em> Sports Engineering (2024)。任务定义、数据与指标和 2022 完全相同。</p>
+
+<h3 id="c23-board">排行榜</h3>
+<div class="tblwrap"><table>
+<thead><tr><th>队伍</th><th class="num">mAP</th><th class="num">Rank-1</th><th>有方法摘要</th></tr></thead>
+<tbody>
+<tr class="hl"><td>UniBw Munich – VIS</td><td class="num">93.26</td><td class="num">91.26</td><td class="yes">R1</td></tr>
+<tr><td>Baseline（即 2022 冠军 Inspur）</td><td class="num">91.68</td><td class="num">89.41</td><td>见 2022</td></tr>
+<tr><td>sjtu-lenovo</td><td class="num">91.51</td><td class="num">89.17</td><td>无</td></tr>
+<tr><td>MTVACV</td><td class="num">90.11</td><td class="num">87.04</td><td>见 2022</td></tr>
+<tr><td>ErxianBridge</td><td class="num">85.76</td><td class="num">82.33</td><td>无</td></tr>
+<tr><td>cm test</td><td class="num">42.60</td><td class="num">28.73</td><td>无</td></tr>
+</tbody></table></div>
+<p>只有 5 队、28 次提交（首届 13 队、123 次），mAP 从 91.68 涨到 93.26，真正超过去年冠军的只有一支队。MTVACV 这一行与 2022 成绩完全相同，看起来是沿用的旧成绩（我的推断）。这一届只有冠军提供了方法摘要；组织者对其它队只有一句总结：方案基本基于 ViT，多数采用 CLIP 基础模型，外加模型集成、按 action 的重排序和 action-based 训练采样器。</p>
+
+<h3 id="c23-clip">R1 CLIP-ReIdent <span class="rank">Habel, Deuser, Oswald · 93.26（test 93.51）</span></h3>
+<div class="said"><span class="lab">报告里说了什么</span>方法主要基于他们的论文 <em>CLIP-ReIdent: Contrastive Training for Player Re-Identification</em>，它也是 2022 年 MMSports（DeepSportradar 篮球）球员 re-ID 挑战的冠军。用 OpenCLIP 与 OpenAI 的三个 CLIP 模型做集成；训练时用自定义采样策略把同一 action 的球员一起采样；后处理用自己设计的按 action 重排序；CLIP 的视觉编码器用对比训练微调，目标是 InfoNCE，数据为 train + valid。</div>
+<div class="eq"><div class="eq-head"><span class="src src-std">标准定义</span><span class="what">CLIP 原本的图文对比目标</span></div>
+<div class="eq-body">\[ L_{CLIP} = \tfrac12\big(L_{i\to t}+L_{t\to i}\big), \qquad L_{i\to t} = -\frac{1}{N}\sum_{i=1}^{N}\log\frac{\exp\big(v_i^{\top}t_i/\tau\big)}{\sum_{j=1}^{N}\exp\big(v_i^{\top}t_j/\tau\big)} \]</div>
+<div class="eq-note">\(v\)、\(t\) 分别是归一化的图像与文本特征。</div></div>
+<div class="eq"><div class="eq-head"><span class="src src-mine">我的形式化</span><span class="what">CLIP-ReIdent 的微调目标：把文本换成同一球员的另一张图</span></div>
+<div class="eq-body">\[ L = -\frac{1}{N}\sum_{i=1}^{N}\log\frac{\exp\big(z_i^{\top}z_i^{+}/\tau\big)}{\sum_{k=1}^{N}\exp\big(z_i^{\top}z_k^{+}/\tau\big)} \]</div>
+<div class="eq-note">\(z_i\) 与 \(z_i^{+}\) 是同一球员两张图的视觉特征。按我对其独立论文的印象，损失是对称的、温度可学习；该论文不在语料里，需自行核实。</div></div>
+<ul>
+  <li><strong>采样器</strong>：同一 action 的球员放在一起。batch 内的负样本就是同一时刻场上的其他人（包括同队球员），是天然的难负样本；同时避开了 MIG 所说的跨 action 假负样本。</li>
+  <li><strong>按 action 重排序</strong>：报告没给细节。它利用的是 action 内候选集很小、结构固定这一点，与 ReBatch 的互斥调整属于同一类。</li>
+  <li><strong>为什么 CLIP 管用</strong>：同组作者在 DeepSportradar-v2（#57）里给过解释——CLIP 零样本就能捕捉球衣号、颜色这些属性，而这些属性不太受视角影响。</li>
+</ul>
+
+<h3 id="c23-tm">跟踪冠军 TrackMerger v2 <span class="rank">Kalisteo · HOTA 75.61</span></h3>
+<p>这一届不再提供真值检测框，要做完整的检测加关联（baseline 42.38），所以与 2022 的 93.64 不可比。相对第一版的变化：</p>
+<ul>
+  <li>检测换成 YOLO-X。</li>
+  <li>逐帧关联做两次匈牙利匹配（IoU 与中心距），Kalman 滤波带相机运动补偿。</li>
+  <li>在球员交叉处把 tracklet 切开，得到"无歧义 tracklet"。</li>
+  <li>用这些 tracklet 以 triplet 微调 Multiple Granularity Network，正负样本取法与第一版相同。</li>
+  <li>按 re-ID 向量距离迭代合并，避免身份重复与"瞬移"。</li>
+</ul>
+
+<h3 id="c23-j2">号码识别第 2 名对 v3 图像的用法</h3>
+<p>UniBw（90.95%）用 OpenAI 的 CLIP 给 SoccerNet Re-Identification 数据集的球员图零样本打号码伪标签，再用伪标签微调。他们只用了 v3 ReID 的<strong>图像</strong>，丢掉了身份标签。</p>
+</section>
+
+<section id="parts">
+<h2>四、部件对照：能拿什么，不能拿什么</h2>
+<div class="tblwrap"><table>
+<thead><tr><th>部件</th><th>来源</th><th>本质</th><th>你能否直接用</th></tr></thead>
+<tbody>
+<tr><td>删少样本身份 + focal</td><td>Inspur、#103</td><td>应对每个身份只有几张图</td><td><span class="yes">能</span>，成本为零</td></tr>
+<tr><td>ArcFace / CosFace</td><td>Inspur、MGSoccer</td><td>需要分类头</td><td>身份太多、每身份样本太少时不如 InfoNCE</td></tr>
+<tr><td>InfoNCE + 按 action 采样</td><td>MIG、CLIP-ReIdent</td><td>无分类头；难负样本来自同一时刻场上的人</td><td><span class="yes">最该继承的一条</span></td></tr>
+<tr><td>跨 action 假负样本规避</td><td>MIG</td><td>由 v3 的标注结构决定</td><td><span class="yes">必须处理</span></td></tr>
+<tr><td>LUPerson / DINO / CLIP 预训练</td><td>MGSoccer、MTVACV、UniBw</td><td>强初始化</td><td><span class="yes">能</span>，但论文里要说明</td></tr>
+<tr><td>可见性感知部件特征</td><td>MTVACV</td><td>处理遮挡，不处理视角</td><td>这是你要改进的地方</td></tr>
+<tr><td>互斥后处理、按 action 重排序</td><td>ReBatch、UniBw、#103</td><td>利用 action 内的分配结构</td><td><span class="yes">能</span>；可升级成二分图匹配 + 球场坐标代价</td></tr>
+<tr><td>多模型集成、多分辨率融合</td><td>几乎所有队</td><td>工程手段</td><td>方法论文里一般不算贡献</td></tr>
+<tr><td>在 challenge 集上做域自适应</td><td>Inspur</td><td>使用了测试数据</td><td><span class="no">不能用于公平对比</span></td></tr>
+<tr><td>轨迹内取正、同帧取负的自监督 triplet</td><td>TrackMerger</td><td>从视频里白得 re-ID 监督</td><td><span class="yes">能</span>；适合在回放片段上做无标注自适应</td></tr>
+</tbody></table></div>
+<p><strong>整体结论</strong>：上面所有方法对视角都没有任何显式建模，全靠度量学习或对比学习让模型自己消化远景与近景的差异；而且全部是单帧方法。challenge 的 91–93 靠的是集成、大规模预训练和推理期自适应，单模型、不看测试数据时是 85–87。你的空间就在"显式处理视角"和"序列级匹配"这两点上。</p>
+<p>两位冠军的独立论文——<em>CLIP-ReIdent</em>（Habel et al., MMSports '22）与 <em>Sports Re-ID</em>（Comandur, arXiv 2022）——用了 v3 的 re-ID 数据，但不在引用列表里，因此不在语料内。消融实验、采样器与重排序的具体实现只有它们里才有。</p>
+
+<footer class="colophon">本页是《跨视角球员重识别综述》的配套笔记，单独成页、不并入综述。数字均回 #103、#104、#56 的原文核对；标为"标准定义"与"我的形式化"的公式不出自这三篇文献本身。<a href="citations.html">打开综述</a> · <a href="index.html">返回文献工作台</a></footer>
+</section>
+
+</main>
+</div>
+
+</body></html>
