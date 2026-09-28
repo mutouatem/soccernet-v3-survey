@@ -340,7 +340,7 @@ window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]},svg
 <li><strong>一对一靠结构保证</strong>：一个实例在每个视角最多输出一个框。训练用 DETR 式二分匹配加分类、回归、置信度损失。不需要相机参数，训练时也不需要精确的时间同步或 3D 标注。</li>
 </ul>
 <div class="eq"><div class="eq-head"><span class="src src-paper">原文 Eq. 26、28</span><span class="what">两两平均的 MDA 与"全视角全对"的 UCR</span></div>
-<div class="eq-body">\[ \text{MDA}=\frac{1}{C_N^2F}\sum_{j<k}\sum_{i=1}^{F}\frac{TA_{jk,i}}{GA_{jk,i}+FA_{jk,i}+MA_{jk,i}},\qquad \text{UCR}=\frac{N_{correct}}{N_{total}} \]</div>
+<div class="eq-body">\[ \text{MDA}=\frac{1}{C_N^2F}\sum_{j\lt k}\sum_{i=1}^{F}\frac{TA_{jk,i}}{GA_{jk,i}+FA_{jk,i}+MA_{jk,i}},\qquad \text{UCR}=\frac{N_{correct}}{N_{total}} \]</div>
 <div class="eq-note">UCR 只有在一个目标在所有视角都对（出现与否正确、IoU&gt;0.6、没有多个框抢同一 ID）时才计入。论文举例：9 条两两关联对了 7 条时 MDA≈0.58，但 3 个目标里只有 1 个全对，UCR=0.33。</div></div>
 
 <h3>结果</h3>
