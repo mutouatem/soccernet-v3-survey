@@ -100,7 +100,7 @@ window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]},svg
   <div class="eyebrow">Companion notes · SoccerNet-v3 ReID</div>
   <h1>v3 跨视角 ReID：三篇文献里的方法与公式</h1>
   <p class="lede">把 RFES-ReID（#103）与 SoccerNet 2022 / 2023 两届挑战赛报告（#104、#56）里出现的每一个 re-ID 方法拆开讲，并把涉及的公式排出来。每个公式都标了出处：是论文原文、是组件的标准定义，还是我根据文字描述写出的形式化。</p>
-  <div class="meta"><span><b>3</b> 篇文献</span><span><b>9</b> 个 re-ID 方案</span><span>另含 TrackMerger v1 / v2</span><span>2026-09-21</span></div>
+  <div class="meta"><span><b>3</b> 篇文献 + <b>2</b> 篇独立论文</span><span><b>9</b> 个 re-ID 方案</span><span>另含 TrackMerger v1 / v2</span><span>2026-09-28 修订</span></div>
 </header>
 
 <nav class="toc" aria-label="目录">
@@ -143,9 +143,10 @@ window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]},svg
 
 <section id="read">
 <h2>读前说明</h2>
-<p>两篇挑战赛报告里，每个方法只有一段文字摘要，<strong>报告本身没有任何公式，也没有超参数</strong>。RFES-ReID 是正式论文，有编号公式 Eq. 1–7。所以本页的公式有三种来源，用色标区分：</p>
+<p>两篇挑战赛报告里，每个方法只有一段文字摘要，<strong>报告本身没有任何公式，也没有超参数</strong>。RFES-ReID 是正式论文，有编号公式 Eq. 1–7。两支冠军队另有独立论文。所以本页的公式有四种来源，用色标区分：</p>
 <ul class="legend">
   <li><span><span class="src src-paper">原文</span></span><span>论文里有编号的公式，我回原文逐条对过。只出现在 RFES-ReID 一节。</span></li>
+  <li><span><span class="src src-paper">独立论文</span></span><span>两支冠军队另有独立论文（Sports Re-ID、CLIP-ReIdent），不在综述语料内；我读了原文，公式按原文写。</span></li>
   <li><span><span class="src src-std">标准定义</span></span><span>报告只说"用了 ArcFace / InfoNCE / DINO…"，这里给的是该组件在其原始论文中的通行写法。参赛队的具体取值与改动，报告没写。</span></li>
   <li><span><span class="src src-mine">我的形式化</span></span><span>原文只有文字或示意图，公式是我按描述写出来的；属于推断，引用前请自行核对。</span></li>
 </ul>
@@ -268,7 +269,7 @@ X' &amp;= \mathrm{reshape}(F') &amp;&amp; (B,\,C,\,H,\,W)\rightarrow(B,\,HW,\,C)
 <tr><td>RFES-ReID，无重排序</td><td>Swin-T</td><td class="num">81.8</td><td class="num">85.0</td></tr>
 <tr class="hl"><td>RFES-ReID，有重排序</td><td>Swin-T</td><td class="num">84.1</td><td class="num">86.7</td></tr>
 </tbody></table></div>
-<div class="warn"><b>读这张表要留意。</b>各对比行是自行复现还是转引，论文没说；ResNet50 一行的 48.4 / 59.1 与 2022 挑战赛 challenge 集官方 baseline（Rank-1 48.41 / mAP 59.11）数值相同，疑似混用了不同 split（我的推断）。正文称融合损失在 Market-1501 上为 95.10 / 86.97，Table 1 却是 95.7 / 87.3。方法对视角变化没有任何设计，作者把 perspective difference 留作未来工作；全部单帧；代码需向作者索取。</div>
+<div class="warn"><b>读这张表要留意。</b>OSNet、ViT-B/16 baseline、DeiT baseline 三行与 Sports Re-ID 独立论文 Table 2 里“随机采样 + triplet”的行数值完全相同，应为转引；骨干标注有出入（那边的 DeiT 是 DeiT-Tiny/16，取得 81.5 / 86.0 的是 ViT-B/16，不是 ViT-S/16）。ResNet50 一行的 48.4 / 59.1 与 2022 挑战赛 challenge 集官方 baseline（Rank-1 48.41 / mAP 59.11）数值相同，疑似混用了不同 split（我的推断）。正文称融合损失在 Market-1501 上为 95.10 / 86.97，Table 1 却是 95.7 / 87.3。方法对视角变化没有任何设计，作者把 perspective difference 留作未来工作；全部单帧；代码需向作者索取。</div>
 </section>
 
 <section id="c22">
@@ -280,6 +281,7 @@ X' &amp;= \mathrm{reshape}(F') &amp;&amp; (B,\,C,\,H,\,W)\rightarrow(B,\,HW,\,C)
   <li><strong>任务</strong>：在比赛某一时刻的某个 action 内，跨多个相机视角重识别球员与裁判。</li>
   <li><strong>数据</strong>：SoccerNet-v3 ReID，340,993 张缩略图，400 场、6 大联赛；分 train / valid / test / challenge，按 challenge 集 mAP 排名。</li>
   <li><strong>组织者认定的难点</strong>：同队外观几乎一样；每个身份只有几张图；分辨率差异大。</li>
+  <li><strong>协议天然跨视角</strong>：action 帧（直播）里的每个检测框是 query，该 action 对应回放帧里的检测框是 gallery；test 为 query 11,777 / gallery 34,989，challenge 为 query 9,021 / gallery 26,082。这一条两份报告都没写，出自 Sports Re-ID 的独立论文。</li>
 </ul>
 <div class="tblwrap"><table>
 <thead><tr><th>名次</th><th>队伍</th><th class="num">mAP</th><th class="num">Rank-1</th><th>有方法摘要</th></tr></thead>
@@ -349,13 +351,57 @@ L &amp;= -\sum_{x\in\{x^{g}_{1},x^{g}_{2}\}}\ \sum_{x'\in V,\ x'\ne x} P_t(x)^{\
 
 <h3 id="c22-r4">R4 gunners / Sports Re-ID <span class="rank">Comandur · 89.47</span></h3>
 <div class="said"><span class="lab">报告里说了什么</span>不用随机采样，而用一种新的流程为每个 batch 选样本；用带 centroid 的损失更好地分开 embedding；最后做 model soup 进一步提高 mAP。模型只用 ImageNet 预训练。</div>
-<div class="eq"><div class="eq-head"><span class="src src-mine">我的形式化</span><span class="what">Centroid triplet 的通用形式</span></div>
-<div class="eq-body">\[ c_{P} = \frac{1}{|P|}\sum_{i\in P} f(x_i), \qquad L = \Big[\, \lVert f(a)-c_{P}\rVert - \lVert f(a)-c_{N}\rVert + m \,\Big]_{+} \]</div>
-<div class="eq-note">\(c_P\)、\(c_N\) 是正、负身份的特征均值。他实际用的形式要看独立论文（arXiv 2206 开头，不在语料里）。</div></div>
-<div class="eq"><div class="eq-head"><span class="src src-std">标准定义</span><span class="what">Model soup：对权重取平均，不是对预测取平均</span></div>
-<div class="eq-body">\[ \theta_{soup} = \frac{1}{M}\sum_{m=1}^{M}\theta_m \]</div>
-<div class="eq-note">推理时只跑一个模型，没有集成的开销。</div></div>
-<p>它是前几名里最省的配方：不用 LUPerson，不用集成。"分层采样"大概是按"比赛 → action → 身份"逐层抽样（我的推断）。</p>
+<p>这支队伍有独立论文（Comandur, <em>Sports Re-ID</em>, arXiv:2206.02373，代码公开）。以下按原文。</p>
+<h4>动机</h4>
+<p>检索时，一个 query 面对的候选都来自同一场比赛的两支球队或裁判。常规做法是从整个数据集随机抽身份组批，批里混着很多支球队，网络容易学会靠球衣差异区分；这种特征在“同队球员互相比较”时没有区分力。训练批次与检索时的样本分布不一致。</p>
+<h4>分层采样</h4>
+<p>利用每张图自带的元数据（action、比赛、年份、两支参赛球队），把数据分成 8 级。组一个批次时先随机取一个样本，再从第 I 级开始取；不够就进入下一级；取过的样本本轮不再使用。</p>
+<div class="tblwrap"><table>
+<thead><tr><th>层级</th><th>含义（独立论文 Table 1）</th></tr></thead>
+<tbody>
+<tr><td>O</td><td>随机取的一个样本，连同它的 action、比赛、年份和两支球队</td></tr>
+<tr><td>I</td><td>同一 action 的全部样本</td></tr>
+<tr><td>II</td><td>同一场比赛的全部样本</td></tr>
+<tr><td>III</td><td>同一年、相同两支球队之间任意比赛的样本</td></tr>
+<tr><td>IV</td><td>任意年份、相同两支球队之间任意比赛的样本</td></tr>
+<tr><td>V</td><td>同一年、至少含其中一支球队的比赛的样本</td></tr>
+<tr><td>VI</td><td>任意年份、至少含其中一支球队的比赛的样本</td></tr>
+<tr><td>VII</td><td>全部样本</td></tr>
+</tbody></table></div>
+<h4>中心损失</h4>
+<div class="eq"><div class="eq-head"><span class="src src-paper">独立论文 Eq. 1–2</span><span class="what">Batch-hard triplet（基线）</span></div>
+<div class="eq-body">\[ L_T = \sum_{A\in B}\big[\, m + D_{A,P} - D_{A,N} \,\big]_{+} \]</div>
+<div class="eq-note">每批 \(M\) 个身份 × 每身份 \(K\) 张；\(P\)、\(N\) 是批内最难的正、负样本。</div></div>
+<div class="eq"><div class="eq-head"><span class="src src-paper">独立论文 Eq. 3</span><span class="what">Triplet-centroid 损失：论文比较后认为几乎无增益</span></div>
+<div class="eq-body">\[ L_{TC}(A) = \big[\, m + D_{A,\,Centroid_P} - D_{A,\,Centroid_N} \,\big]_{+} \]</div></div>
+<div class="eq"><div class="eq-head"><span class="src src-paper">独立论文 Eq. 4–7</span><span class="what">实际采用的中心损失</span></div>
+<div class="eq-body">\[ \begin{aligned}
+C_{\mathrm{I}}(M_i) &amp;= \frac{1}{K}\sum_{J:\,y(J)=M_i} F_J, \qquad C_{\mathrm{II}}(M_i) = \frac{1}{KM-K}\sum_{J:\,y(J)\ne M_i} F_J\\[4pt]
+L_{Centroid} &amp;= \sum_{M_i}\ \big\lVert C_{\mathrm{I}}(M_i) - C_{\mathrm{II}}(M_i) \big\rVert_2
+\end{aligned} \]</div>
+<div class="eq-note">对批内每个身份，把样本分成两簇：该身份的 \(K\) 个样本，与其余 \(KM-K\) 个样本；损失是两簇中心的欧氏距离。</div></div>
+<div class="eq"><div class="eq-head"><span class="src src-paper">独立论文 Eq. 8</span><span class="what">总损失</span></div>
+<div class="eq-body">\[ L = \alpha\,L_T + \beta\,L_C + \gamma\,L_{Centroid}, \qquad \alpha=0.9,\ \beta=0.5,\ \gamma=0.5 \]</div>
+<div class="eq-note">\(L_C\) 为分类（交叉熵）损失。</div></div>
+<div class="warn"><b>原式的方向值得留意。</b>按 Eq. 6–8 的写法，最小化 \(L\) 会把两个中心拉近，而论文文字说的是把不同身份的簇“推开”。两者方向相反；实际实现以公开代码为准。这是我读原文时的观察。</div>
+<h4>结果</h4>
+<div class="tblwrap"><table>
+<thead><tr><th>骨干（独立论文 Table 2，test split）</th><th class="num">随机采样 + triplet<br>mAP / R1</th><th class="num">分层采样 + triplet<br>mAP / R1</th><th class="num">分层采样 + 中心损失<br>mAP / R1</th></tr></thead>
+<tbody>
+<tr><td>ResNet50-fc512</td><td class="num">70.3 / 61.2</td><td class="num">66.7 / 57.7</td><td class="num">81.8 / 76.1</td></tr>
+<tr><td>OSNet_x1_0</td><td class="num">76.4 / 69.2</td><td class="num">75.8 / 69.1</td><td class="num">83.4 / 78.0</td></tr>
+<tr><td>DeiT-Tiny/16</td><td class="num">73.2 / 65.0</td><td class="num">80.5 / 74.4</td><td class="num">82.2 / 76.2</td></tr>
+<tr><td>DeiT-S/16</td><td class="num">75.3 / 67.8</td><td class="num">81.0 / 74.7</td><td class="num">84.3 / 79.4</td></tr>
+<tr class="hl"><td>ViT-B/16</td><td class="num">75.7 / 68.2</td><td class="num">81.4 / 75.4</td><td class="num">86.0 / 81.5</td></tr>
+</tbody></table></div>
+<ul>
+  <li>两项合用，五种骨干的 mAP 提升 7–11.5 点，Rank-1 提升 8.8–14.9 点，网络与超参数不变。</li>
+  <li>只加分层采样、不加中心损失：三种 Transformer 的 mAP 涨 5.7–7.3 点，两种 CNN 反而下降（ResNet50 约降 3.6）。作者自己也表示意外，没有给出解释。</li>
+  <li>换成 triplet-centroid 损失几乎没有变化（ViT-B/16：81.4 → 81.7）。</li>
+  <li>官方给的 ResNet50-fc512 baseline 是 mAP 57.40 / R1 45.89；作者只调 batch size 和几个超参数就到了 70.3 / 61.2。</li>
+  <li>单模型在 challenge split 上是 mAP 84.9 / R1 80.1。报告里的 89.47 出自之后的 model soup；独立论文里没有写 model soup。</li>
+  <li>全部只用 ImageNet 预训练，训练 40 个 epoch，单张 A100。</li>
+</ul>
 
 <h3 id="c22-r5">R5 MIG <span class="rank">89.44</span></h3>
 <div class="said"><span class="lab">报告里说了什么</span>改进经典采样策略：随机取 A 个 action、I 个身份、每身份 K 张图，得到 A×I×K 的 batch；action 总数很大加上随机性，可以避免同一球员的不同身份出现在同一 batch。batch 内用非参数 InfoNCE。骨干是 TransReID-SSL 里带 ICS 的 ViT。基于 Transformer 的自注意力提出一种特征融合方法，为原始 query 特征生成精炼特征。5 个模型（输入尺寸与预训练不同）集成生成最终距离矩阵。</div>
@@ -418,16 +464,40 @@ L &amp;= -\sum_{x\in\{x^{g}_{1},x^{g}_{2}\}}\ \sum_{x'\in V,\ x'\ne x} P_t(x)^{\
 
 <h3 id="c23-clip">R1 CLIP-ReIdent <span class="rank">Habel, Deuser, Oswald · 93.26（test 93.51）</span></h3>
 <div class="said"><span class="lab">报告里说了什么</span>方法主要基于他们的论文 <em>CLIP-ReIdent: Contrastive Training for Player Re-Identification</em>，它也是 2022 年 MMSports（DeepSportradar 篮球）球员 re-ID 挑战的冠军。用 OpenCLIP 与 OpenAI 的三个 CLIP 模型做集成；训练时用自定义采样策略把同一 action 的球员一起采样；后处理用自己设计的按 action 重排序；CLIP 的视觉编码器用对比训练微调，目标是 InfoNCE，数据为 train + valid。</div>
+<div class="warn"><b>独立论文的实验不是在 SoccerNet 上做的。</b>我读了原文（arXiv:2303.11855）：全部实验做在 DeepSportradar 篮球 re-ID 数据上，同一相机、同一视角，训练集只有 436 名球员。SoccerNet 上的三模型集成、按 action 采样与 93.26 的成绩，只见于上面这段报告摘要。这篇论文对“跨视角”不提供直接证据。</div>
 <div class="eq"><div class="eq-head"><span class="src src-std">标准定义</span><span class="what">CLIP 原本的图文对比目标</span></div>
 <div class="eq-body">\[ L_{CLIP} = \tfrac12\big(L_{i\to t}+L_{t\to i}\big), \qquad L_{i\to t} = -\frac{1}{N}\sum_{i=1}^{N}\log\frac{\exp\big(v_i^{\top}t_i/\tau\big)}{\sum_{j=1}^{N}\exp\big(v_i^{\top}t_j/\tau\big)} \]</div>
 <div class="eq-note">\(v\)、\(t\) 分别是归一化的图像与文本特征。</div></div>
-<div class="eq"><div class="eq-head"><span class="src src-mine">我的形式化</span><span class="what">CLIP-ReIdent 的微调目标：把文本换成同一球员的另一张图</span></div>
-<div class="eq-body">\[ L = -\frac{1}{N}\sum_{i=1}^{N}\log\frac{\exp\big(z_i^{\top}z_i^{+}/\tau\big)}{\sum_{k=1}^{N}\exp\big(z_i^{\top}z_k^{+}/\tau\big)} \]</div>
-<div class="eq-note">\(z_i\) 与 \(z_i^{+}\) 是同一球员两张图的视觉特征。按我对其独立论文的印象，损失是对称的、温度可学习；该论文不在语料里，需自行核实。</div></div>
+<div class="eq"><div class="eq-head"><span class="src src-paper">独立论文 Listing 1</span><span class="what">把图文对比改成图图对比；原文给的是伪代码，这里写成公式</span></div>
+<div class="eq-body">\[ \begin{aligned}
+\mathrm{logits}_q &amp;= e^{t}\, I_q I_g^{\top}, \qquad \mathrm{logits}_g = \mathrm{logits}_q^{\top}\\[4pt]
+L &amp;= \tfrac12\Big(\mathrm{CE}\big(\mathrm{logits}_q,\ \mathrm{labels}\big) + \mathrm{CE}\big(\mathrm{logits}_g,\ \mathrm{labels}\big)\Big), \qquad \mathrm{labels} = (0,1,\dots,n-1)
+\end{aligned} \]</div>
+<div class="eq-note">\(I_q\)、\(I_g\) 是同一批 query 与 gallery 图像经<strong>同一个</strong>图像编码器得到的 L2 归一化特征；\(t\) 是可学习的温度参数。</div></div>
 <ul>
-  <li><strong>采样器</strong>：同一 action 的球员放在一起。batch 内的负样本就是同一时刻场上的其他人（包括同队球员），是天然的难负样本；同时避开了 MIG 所说的跨 action 假负样本。</li>
-  <li><strong>按 action 重排序</strong>：报告没给细节。它利用的是 action 内候选集很小、结构固定这一点，与 ReBatch 的互斥调整属于同一类。</li>
-  <li><strong>为什么 CLIP 管用</strong>：同组作者在 DeepSportradar-v2（#57）里给过解释——CLIP 零样本就能捕捉球衣号、颜色这些属性，而这些属性不太受视角影响。</li>
+  <li><strong>只留视觉编码器</strong>：丢掉文本编码器、文本侧的嵌入与投影层，也不用视觉侧的投影层。</li>
+  <li><strong>正样本不是同一张图的增强</strong>，而是同一球员 tracklet 里不同姿态、不同机位的另一张图。</li>
+  <li><strong>采样器</strong>：批大小 16；一个“query–gallery 图像对”算一个实例；批内只放不同球员的实例，否则无法明确哪张 gallery 对应哪张 query。</li>
+  <li><strong>label smoothing 0.1</strong>：采样器管不了“别的球员也出现在这张图里”的情况，用它来软化目标。</li>
+  <li><strong>输入</strong>：用零填充保持长宽比，不做中心裁剪；增强只用随机水平翻转。</li>
+  <li><strong>后处理</strong>：重排序；论文同时报告了不做重排序的成绩。</li>
+</ul>
+<div class="tblwrap"><table>
+<thead><tr><th>模型（DeepSportradar 篮球，test 集 mAP）</th><th>预训练</th><th class="num">零样本</th><th class="num">零样本 + 重排序</th><th class="num">微调</th><th class="num">微调 + 重排序</th></tr></thead>
+<tbody>
+<tr><td>convnext_base</td><td>ImageNet</td><td class="num">44.8</td><td class="num">61.6</td><td class="num">89.9</td><td class="num">96.0</td></tr>
+<tr><td>convnext_large</td><td>ImageNet</td><td class="num">50.0</td><td class="num">66.2</td><td class="num">91.2</td><td class="num">96.9</td></tr>
+<tr><td>vit_base_patch16_224</td><td>ImageNet</td><td class="num">43.0</td><td class="num">59.7</td><td class="num">89.9</td><td class="num">95.4</td></tr>
+<tr><td>vit_large_patch16_224</td><td>ImageNet</td><td class="num">52.9</td><td class="num">69.4</td><td class="num">92.5</td><td class="num">97.1</td></tr>
+<tr><td>RN50x16</td><td>CLIP</td><td class="num">54.8</td><td class="num">70.6</td><td class="num">88.5</td><td class="num">94.9</td></tr>
+<tr><td>ViT-B/16</td><td>CLIP</td><td class="num">63.1</td><td class="num">81.8</td><td class="num">95.0</td><td class="num">98.1</td></tr>
+<tr class="hl"><td>ViT-L/14</td><td>CLIP</td><td class="num">66.8</td><td class="num">85.0</td><td class="num">96.9</td><td class="num">98.2</td></tr>
+</tbody></table></div>
+<ul>
+  <li>篮球 challenge 集上，单模型 ViT-L/14 为 mAP 98.44 / Rank-1 99.15，ViT-B/16 为 97.56 / 98.72（独立论文 Table 3）；没有用集成。</li>
+  <li>CLIP 预训练的 ViT 在零样本时领先最多；CLIP 的 CNN（RN50x16）微调后反而不如 ImageNet 预训练的模型。</li>
+  <li><strong>为什么 CLIP 管用</strong>：论文用文字提示做了零样本属性分类，CLIP 不经训练就能读出球衣号、球衣颜色等属性；Score-CAM 可视化显示，微调后的模型关注头部、球衣和鞋。</li>
+  <li><strong>SoccerNet 版本的按 action 重排序</strong>：报告没给细节，独立论文里也没有。</li>
 </ul>
 
 <h3 id="c23-tm">跟踪冠军 TrackMerger v2 <span class="rank">Kalisteo · HOTA 75.61</span></h3>
@@ -451,6 +521,7 @@ L &amp;= -\sum_{x\in\{x^{g}_{1},x^{g}_{2}\}}\ \sum_{x'\in V,\ x'\ne x} P_t(x)^{\
 <tbody>
 <tr><td>删少样本身份 + focal</td><td>Inspur、#103</td><td>应对每个身份只有几张图</td><td><span class="yes">能</span>，成本为零</td></tr>
 <tr><td>ArcFace / CosFace</td><td>Inspur、MGSoccer</td><td>需要分类头</td><td>身份太多、每身份样本太少时不如 InfoNCE</td></tr>
+<tr><td>分层采样（同 action → 同场 → 同对阵）</td><td>Sports Re-ID</td><td>让训练批次的构成接近检索时的候选集</td><td><span class="yes">能</span>；代码公开，五种骨干上 mAP +7 至 +11.5</td></tr>
 <tr><td>InfoNCE + 按 action 采样</td><td>MIG、CLIP-ReIdent</td><td>无分类头；难负样本来自同一时刻场上的人</td><td><span class="yes">最该继承的一条</span></td></tr>
 <tr><td>跨 action 假负样本规避</td><td>MIG</td><td>由 v3 的标注结构决定</td><td><span class="yes">必须处理</span></td></tr>
 <tr><td>LUPerson / DINO / CLIP 预训练</td><td>MGSoccer、MTVACV、UniBw</td><td>强初始化</td><td><span class="yes">能</span>，但论文里要说明</td></tr>
@@ -461,9 +532,9 @@ L &amp;= -\sum_{x\in\{x^{g}_{1},x^{g}_{2}\}}\ \sum_{x'\in V,\ x'\ne x} P_t(x)^{\
 <tr><td>轨迹内取正、同帧取负的自监督 triplet</td><td>TrackMerger</td><td>从视频里白得 re-ID 监督</td><td><span class="yes">能</span>；适合在回放片段上做无标注自适应</td></tr>
 </tbody></table></div>
 <p><strong>整体结论</strong>：上面所有方法对视角都没有任何显式建模，全靠度量学习或对比学习让模型自己消化远景与近景的差异；而且全部是单帧方法。challenge 的 91–93 靠的是集成、大规模预训练和推理期自适应，单模型、不看测试数据时是 85–87。你的空间就在"显式处理视角"和"序列级匹配"这两点上。</p>
-<p>两位冠军的独立论文——<em>CLIP-ReIdent</em>（Habel et al., MMSports '22）与 <em>Sports Re-ID</em>（Comandur, arXiv 2022）——用了 v3 的 re-ID 数据，但不在引用列表里，因此不在语料内。消融实验、采样器与重排序的具体实现只有它们里才有。</p>
+<p>两支冠军队的独立论文——<em>Sports Re-ID</em>（Comandur, arXiv:2206.02373）与 <em>CLIP-ReIdent</em>（Habel et al., arXiv:2303.11855）——都没有引用 v3 的数据论文，不在综述语料内；本页相应两节已按原文改写。其余四支队伍（Inspur、MGSoccer、MTVACV、MIG）和 ReBatch 没有找到独立论文，仍只有报告里的摘要。</p>
 
-<footer class="colophon">本页是《跨视角球员重识别综述》的配套笔记，单独成页、不并入综述。数字均回 #103、#104、#56 的原文核对；标为"标准定义"与"我的形式化"的公式不出自这三篇文献本身。<a href="citations.html">打开综述</a> · <a href="index.html">返回文献工作台</a></footer>
+<footer class="colophon">本页是《跨视角球员重识别综述》的配套笔记，单独成页、不并入综述。数字均回 #103、#104、#56 的原文核对；标为"独立论文"的公式出自两支冠军队的独立论文；标为"标准定义"与"我的形式化"的公式不出自这些文献本身。<a href="citations.html">打开综述</a> · <a href="index.html">返回文献工作台</a></footer>
 </section>
 
 </main>
