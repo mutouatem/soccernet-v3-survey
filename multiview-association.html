@@ -1,0 +1,495 @@
+<!doctype html><html><head><meta name="robots" content="noindex, nofollow, noarchive"><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>多视角关联六篇精读</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@700&family=Noto+Sans+SC:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --bg:#F6F8F5; --surface:#FFFFFF; --text:#1B1F1C; --muted:#5B655E; --line:#D9E0DA; --line-strong:#B9C4BC;
+  --accent:#1F6B45; --accent-ink:#14523A; --accent-soft:#E6F0E9; --amber:#8F6210; --amber-bg:#FBF3E1; --amber-line:#E8D5A3;
+  --code-bg:#EEF2EF; --shadow:0 1px 2px rgba(20,40,28,.06); --on-accent:#FFFFFF;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#0F1412; --surface:#161C18; --text:#E4EAE5; --muted:#9AA79E; --line:#27302A; --line-strong:#3A463E;
+  --accent:#5FBF8A; --accent-ink:#8ADBAE; --accent-soft:#1B2A21; --amber:#E4B04A; --amber-bg:#2A2313; --amber-line:#5A4A1E;
+  --code-bg:#1E2622; --shadow:none; --on-accent:#0F1412;
+}}
+:root[data-theme="dark"]{
+  --bg:#0F1412; --surface:#161C18; --text:#E4EAE5; --muted:#9AA79E; --line:#27302A; --line-strong:#3A463E;
+  --accent:#5FBF8A; --accent-ink:#8ADBAE; --accent-soft:#1B2A21; --amber:#E4B04A; --amber-bg:#2A2313; --amber-line:#5A4A1E;
+  --code-bg:#1E2622; --shadow:none; --on-accent:#0F1412;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:"Noto Sans SC","PingFang SC","Hiragino Sans GB","Microsoft YaHei",system-ui,sans-serif;font-size:15.5px;line-height:1.75;padding-block:0 96px;padding-inline:0}
+a{color:var(--accent-ink)}
+a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.shell{display:grid;grid-template-columns:248px minmax(0,1fr);gap:48px;max-width:1180px;margin:0 auto;padding-inline:24px}
+header.masthead{grid-column:1/-1;padding-block:48px 26px;border-bottom:1px solid var(--line)}
+.eyebrow{font-family:"IBM Plex Mono",ui-monospace,Menlo,monospace;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent-ink)}
+.back{display:inline-block;margin-bottom:18px;font-size:13.5px;text-decoration:none;border-bottom:1px solid var(--line-strong);padding-bottom:1px}
+.back:hover{border-color:var(--accent)}
+h1{font-family:"Noto Serif SC","Songti SC","SimSun",serif;font-weight:700;font-size:clamp(28px,4vw,42px);line-height:1.2;margin:10px 0 12px;text-wrap:balance}
+.lede{font-size:17px;color:var(--muted);max-width:66ch;margin:0 0 18px}
+.meta{display:flex;flex-wrap:wrap;gap:8px 22px;font-family:"IBM Plex Mono",ui-monospace,Menlo,monospace;font-size:12.5px;color:var(--muted)}
+.meta b{color:var(--text);font-weight:600}
+nav.toc{position:sticky;top:calc(20px + env(safe-area-inset-top, 0px));align-self:start;max-height:calc(100vh - 40px);overflow:auto;font-size:13.5px;padding-right:8px;scrollbar-width:thin;scrollbar-color:var(--line-strong) transparent}
+.toc-head{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:11.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
+.toc ol{list-style:none;margin:0;padding:0}
+.toc-l1>li{margin:0 0 6px}
+.toc-l1>li>a{font-weight:600;color:var(--text);text-decoration:none}
+.toc-l2{margin:4px 0 8px 10px!important;border-left:1px solid var(--line);padding-left:10px!important}
+.toc-l2 li{margin:2px 0}
+.toc-l2 a{color:var(--muted);text-decoration:none}
+.toc a:hover{color:var(--accent-ink)}
+main{min-width:0;max-width:780px}
+main>section{padding-block:36px 8px;border-bottom:1px solid var(--line)}
+main>section:last-of-type{border-bottom:0}
+h2{font-family:"Noto Serif SC","Songti SC",serif;font-size:27px;line-height:1.3;margin:0 0 18px;text-wrap:balance}
+h3{font-family:"Noto Serif SC","Songti SC",serif;font-size:20px;line-height:1.35;margin:36px 0 10px;text-wrap:balance}
+h3 .rank{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:12.5px;font-weight:500;color:var(--muted);margin-left:8px;white-space:nowrap}
+h4{font-size:16px;font-weight:700;margin:24px 0 8px}
+p{margin:0 0 14px}
+ul,ol{margin:0 0 14px;padding-left:22px}
+li{margin:4px 0}
+code{font-family:"IBM Plex Mono",ui-monospace,Menlo,monospace;font-size:.88em;background:var(--code-bg);padding:1px 5px;border-radius:3px}
+.pid{font-family:"IBM Plex Mono",ui-monospace,Menlo,monospace;font-size:.86em;background:var(--accent-soft);color:var(--accent-ink);padding:0 5px;border-radius:4px;white-space:nowrap}
+
+/* formula blocks: the chip states where the formula comes from */
+.eq{margin:14px 0 20px;background:var(--surface);border:1px solid var(--line);border-radius:6px;box-shadow:var(--shadow)}
+.eq-head{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;padding:7px 12px;border-bottom:1px solid var(--line);font-size:12.5px;color:var(--muted)}
+.eq-head .what{font-weight:500;color:var(--text)}
+.eq-body{padding:6px 14px;overflow-x:auto}
+.eq-note{padding:0 14px 10px;font-size:13.5px;color:var(--muted)}
+.src{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:11.5px;letter-spacing:.04em;padding:1px 8px;border-radius:999px;white-space:nowrap;border:1px solid transparent}
+.src-paper{background:var(--accent);color:var(--on-accent)}
+.src-std{border-color:var(--line-strong);color:var(--text)}
+.src-mine{background:var(--amber-bg);border-color:var(--amber-line);color:var(--amber)}
+.legend{display:grid;gap:10px;margin:0 0 8px;padding:0;list-style:none}
+.legend li{display:grid;grid-template-columns:92px 1fr;gap:12px;align-items:baseline;margin:0}
+.warn{margin:14px 0 18px;padding:10px 16px;border-left:3px solid var(--amber);background:var(--amber-bg);border-radius:0 6px 6px 0;font-size:14.5px}
+.warn b{color:var(--amber)}
+.said{margin:12px 0 14px;padding:10px 16px;border-left:3px solid var(--accent);background:var(--accent-soft);border-radius:0 6px 6px 0;font-size:14.5px}
+.said .lab{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--accent-ink);display:block;margin-bottom:2px}
+.tblwrap{overflow-x:auto;margin:14px 0 20px;border:1px solid var(--line);border-radius:6px;background:var(--surface);box-shadow:var(--shadow)}
+table{border-collapse:collapse;width:100%;font-size:13.5px;line-height:1.5}
+th,td{padding:8px 12px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-weight:600;color:var(--muted);font-size:12.5px;background:var(--code-bg);white-space:nowrap}
+tbody tr:last-child td{border-bottom:0}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums;font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:12.5px;white-space:nowrap}
+tr.hl td{background:var(--accent-soft);font-weight:600}
+.yes{color:var(--accent-ink);font-weight:600}.no{color:var(--amber);font-weight:600}
+footer.colophon{margin-top:40px;font-size:13px;color:var(--muted)}
+mjx-container{color:var(--text)}
+mjx-container[display="true"]{margin:.55em 0!important}
+@media (max-width:900px){
+  .shell{grid-template-columns:1fr;gap:0}
+  nav.toc{position:static;max-height:none;padding:16px 0 8px;border-bottom:1px solid var(--line)}
+  .toc-l2{display:none}
+}
+@media (max-width:520px){ body{font-size:15px} .shell{padding-inline:16px} .legend li{grid-template-columns:1fr;gap:2px} }
+@media (prefers-reduced-motion:reduce){ html{scroll-behavior:auto} }
+</style>
+<style>
+:root{--hi:#1F6B45;--hi-bg:#E6F0E9;--mid:#8F6210;--mid-bg:#FBF3E1;--lo:#5B655E;--lo-bg:#EEF2EF}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){--hi:#8ADBAE;--hi-bg:#1B2A21;--mid:#E4B04A;--mid-bg:#2A2313;--lo:#9AA79E;--lo-bg:#1E2622}}
+:root[data-theme="dark"]{--hi:#8ADBAE;--hi-bg:#1B2A21;--mid:#E4B04A;--mid-bg:#2A2313;--lo:#9AA79E;--lo-bg:#1E2622}
+.fit{display:inline-block;font-size:12px;line-height:1.5;padding:1px 8px;border-radius:999px;white-space:nowrap;font-weight:500}
+.fit-hi{color:var(--hi);background:var(--hi-bg)}.fit-mid{color:var(--mid);background:var(--mid-bg)}.fit-lo{color:var(--lo);background:var(--lo-bg)}
+.cite{font-size:13.5px;color:var(--muted);margin:-6px 0 12px}
+main>section>h2{scroll-margin-top:16px}
+.warn ul{margin:8px 0 0}
+td.yes{color:var(--accent-ink);font-weight:600} td.no{color:var(--muted)}
+</style>
+<script>
+window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]},svg:{fontCache:'global'},options:{enableMenu:false}};
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-svg-full.min.js" async></script>
+<div class="shell">
+<header class="masthead">
+  <a class="back" href="index.html">← 返回文献工作台</a>
+  <div class="eyebrow">Reading notes · Multi-view person association</div>
+  <h1>多视角人员关联：六篇论文精读与对 v3 的适用性</h1>
+  <p class="lede">"同一时刻、多个机位、找出同一个人"这件事，在 SoccerNet-v3 引用圈之外其实有一整条研究线。这里把最相关的六篇逐篇读完：它们各自怎么做、在什么数据上成立、数字多少，以及放到转播直播 ↔ 回放的设定里哪些能用、哪些不能用。</p>
+  <div class="meta"><span><b>6</b> 篇全文精读</span><span>CVPR 2025 · TPAMI 2025 · TGRS 2026 · arXiv ×3</span><span>Google Scholar 2024 年以后检索</span><span>2026-09-28</span></div>
+</header>
+
+<nav class="toc" aria-label="目录">
+  <div class="toc-head">目录</div>
+  <ol class="toc-l1">
+    <li><a href="#read">读前说明与更正</a></li>
+    <li><a href="#overview">六篇总览</a></li>
+    <li><a href="#p1">Self-MVA</a></li>
+    <li><a href="#p2">MvMHAT</a></li>
+    <li><a href="#p3">MAEM</a></li>
+    <li><a href="#p4">多无人机冲突自由关联</a></li>
+    <li><a href="#p5">SGC-CCA</a></li>
+    <li><a href="#p6">FUSION / RealMvMoAT</a></li>
+    <li><a href="#fit">拼到你的方案里</a>
+      <ol class="toc-l2">
+        <li><a href="#fit-parts">按部件对照</a></li>
+        <li><a href="#fit-v3">v3 的五个特殊条件</a></li>
+        <li><a href="#fit-order">阅读顺序</a></li>
+      </ol></li>
+  </ol>
+</nav>
+
+<main>
+
+<section id="read">
+<h2>读前说明与更正</h2>
+<p>这六篇是在 Google Scholar 上限定 2024 年以后、按"同步多视角人员关联""多相机跨视角关联""体育多机位"等十组关键词检索，从约 200 条结果中挑出的。每篇都读了方法、实验和局限；文中的数字都回原文核对过，其中 MvMHAT 与 Self-MVA 的主表是图片或排版错位，我把那一页渲染成图逐格对过。<strong>"对 v3"那一栏是我的判断</strong>，不是论文里的内容。</p>
+<div class="warn"><b>读完正文后，需要更正我此前根据摘要作出的几条判断。</b>
+<ul>
+<li><strong>Self-MVA 不适用于移动相机。</strong>作者在结论和附录里明确写了：每个视角有一个固定的可学习相机嵌入和一个固定的解码器，相机一动就不成立。我之前说它"能覆盖 #59 算不出标定的那三分之二 action"，是错的。</li>
+<li><strong>多无人机那篇的一对一约束不是用 Sinkhorn 做的。</strong>它是 DETR 式的"一个实例查询绑定每个视角一个对象查询"，一对一靠结构保证，再用二分匹配训练。</li>
+<li><strong>FUSION 的自适应融合是"每一帧一组权重"，所有视角所有人共享</strong>，不是我之前说的"号码读得清就多信号码"那种逐人、逐线索的可靠性门控。</li>
+<li><strong>MvMHAT 的自采数据用的是 4 台可穿戴 GoPro</strong>，相机是会动的，不属于"固定相机"。</li>
+<li><strong>MAEM 没有单独报告关联准确率</strong>，它评测的是 3D 姿态（MPJPE、recall、AP）。</li>
+</ul></div>
+</section>
+
+<section id="overview">
+<h2>六篇总览</h2>
+<div class="tblwrap"><table>
+<thead><tr><th>论文</th><th>出处</th><th>相机</th><th>要标定</th><th>要身份标注</th><th>关联怎么做</th><th>对 v3</th></tr></thead>
+<tbody>
+<tr><td><a href="#p1">Self-MVA</a></td><td>CVPR 2025</td><td>固定</td><td class="no">不要</td><td class="no">不要</td><td>框布局的几何编码 + 外观，匈牙利；用"是否同一时刻"自监督</td><td><span class="fit fit-mid">借思路</span></td></tr>
+<tr><td><a href="#p2">MvMHAT</a></td><td>TPAMI 2025</td><td>固定 + 可穿戴</td><td class="no">不要</td><td class="no">不要</td><td>外观；对称、传递一致性自监督；Transformer 联合求分配矩阵</td><td><span class="fit fit-hi">直接可用的约束</span></td></tr>
+<tr><td><a href="#p3">MAEM</a></td><td>arXiv 2026</td><td>固定</td><td class="yes">要</td><td class="no">不要（不训练）</td><td>框中心重投影粗筛 + 稠密人体网格极线细筛，匈牙利 + 并查集</td><td><span class="fit fit-hi">纯几何基线</span></td></tr>
+<tr><td><a href="#p4">冲突自由关联</a></td><td>TGRS 2026</td><td>移动（无人机）</td><td class="no">不要</td><td class="yes">要</td><td>DETR 式实例查询，一对一由结构保证</td><td><span class="fit fit-lo">指标可借</span></td></tr>
+<tr><td><a href="#p5">SGC-CCA</a></td><td>arXiv 2024</td><td>固定</td><td class="yes">要</td><td class="yes">要</td><td>外观 + 地面坐标建图，GNN 预测连边，连通分量即身份</td><td><span class="fit fit-mid">快速基线（开源）</span></td></tr>
+<tr><td><a href="#p6">FUSION</a></td><td>arXiv 2026</td><td>移动（无人机 + 地面）</td><td class="no">不要</td><td class="yes">要</td><td>外观、局部上下文、3D 结构、邻居关系四路相似度融合</td><td><span class="fit fit-hi">设定最接近</span></td></tr>
+</tbody></table></div>
+<p>"要身份标注"指训练是否需要跨视角身份真值。v3 本身有这种标注，所以"要"不是障碍；"不要"的方法则多了一种用法——拿 SoccerNet 里大量没标注的转播画面做预训练。</p>
+</section>
+
+<section id="p1">
+<h2>1. Self-MVA：从"是否同一时刻"里学跨视角关联</h2>
+<p class="cite">Keqi Chen, Vinkle Srivastav, Didier Mutter, Nicolas Padoy. <em>Learning from Synchronization: Self-Supervised Uncalibrated Multi-View Person Association in Challenging Scenes.</em> CVPR 2025。代码：github.com/CAMMA-public/Self-MVA</p>
+
+<h3>要解决的问题</h3>
+<p>给定同步、视野有重叠的多视角图像，把同一个人对应起来。作者挑的都是"外观靠不住"的场景：WILDTRACK（7 台相机拍广场人群，光照多变、拥挤）、MVOR（手术室，医护穿一样的衣服）、SOLDIERS（6 台相机，士兵同装）。要求既不用身份标注，也不用相机标定。</p>
+
+<h3>方法</h3>
+<ul>
+<li><strong>几何编码</strong>：每个人只用检测框的左上、右下两个角点，经可学习的 Fourier 位置编码映射到高维，再拼上<strong>该视角的可学习相机嵌入</strong> \(\mathbf v_c\)，过全连接层得到几何特征 \(f_g\)。外观特征用现成的 OSNet。</li>
+<li><strong>解码器</strong>：每个视角一个线性层，把 \(f_g\) 还原成框坐标，只在训练时用，防止编码丢信息。</li>
+<li><strong>前置任务：跨视角图像同步。</strong>视角 i 的第 p 帧为锚点；视角 j 的同一帧为正样本，视角 j 中相隔 5–20 帧的另一帧为负样本。直觉是：同一时刻两个视角里的人群空间分布应满足一个刚体变换，差几帧就对不上了。</li>
+</ul>
+<div class="eq"><div class="eq-head"><span class="src src-paper">原文 Eq. 3、6</span><span class="what">几何输入与实例距离</span></div>
+<div class="eq-body">\[ \mathbf x = [\gamma(\mathbf v_l),\ \gamma(\mathbf v_r),\ \mathbf v_c],\qquad \mathcal D = \alpha\,\mathcal D_a + (1-\alpha)\,\mathcal D_g,\quad \alpha = 0.1 \]</div>
+<div class="eq-note">\(\mathcal D_a\)、\(\mathcal D_g\) 是外观与几何的欧氏距离矩阵。α=0.1 意味着几何占九成权重。</div></div>
+<div class="eq"><div class="eq-head"><span class="src src-paper">原文 Eq. 7、8</span><span class="what">把匈牙利匹配放进损失：实例距离 → 图像距离 → triplet</span></div>
+<div class="eq-body">\[ \mathcal H = \frac{1}{m}\sum \mathcal D[\mathcal M_r;\mathcal M_c],\qquad L_{syn} = \max\big(0,\ \mathcal H_{I_i^p,I_j^p} - \mathcal H_{I_i^p,I_j^q} + \Delta\big) \]</div>
+<div class="eq-note">\((\mathcal M_r,\mathcal M_c)\) 是匈牙利匹配的行、列下标，m 是两帧人数的较小值。同一时刻的图像对，匹配后的平均距离应小于不同时刻的。</div></div>
+<ul>
+<li><strong>两个线性约束</strong>（人多时只靠同步任务收敛不了）：
+  <ul><li>多视角重投影：解码出的框与检测框做 L1。</li>
+  <li>成对边关联：两个人框的中点当作一个"伪人"，它的几何特征应等于两人特征的平均；若两个视角中节点对应，则它们之间的"边"也应对应，据此再算一个边级 triplet。</li></ul></li>
+<li><strong>总损失</strong> \(L = L_{syn}+L_{pro}+L_{edge}\)。推理时匈牙利匹配，再用 \(\mathcal S = 1-\mathcal D/\max\mathcal D\) 按阈值过滤，阈值按数据集手调（0.4 / 0.1 / 0）。</li>
+</ul>
+
+<h3>结果</h3>
+<div class="tblwrap"><table>
+<thead><tr><th>WILDTRACK（Table 1）</th><th>监督</th><th class="num">AP</th><th class="num">P</th><th class="num">R</th><th class="num">ACC</th><th class="num">IPAA-100</th></tr></thead>
+<tbody>
+<tr><td>OSNet（纯 re-ID）</td><td>—</td><td class="num">16.80</td><td class="num">28.27</td><td class="num">29.68</td><td class="num">37.56</td><td class="num">0.0</td></tr>
+<tr><td>OSNet + 极线软约束（用标定）</td><td>—</td><td class="num">59.52</td><td class="num">78.11</td><td class="num">79.07</td><td class="num">82.13</td><td class="num">26.43</td></tr>
+<tr><td>MvMHAT（自监督，只学外观）</td><td>无</td><td class="num">4.44</td><td class="num">5.96</td><td class="num">6.29</td><td class="num">22.37</td><td class="num">0.0</td></tr>
+<tr><td>ASNet</td><td>全监督</td><td class="num">73.40</td><td class="num">—</td><td class="num">—</td><td class="num">—</td><td class="num">32.10</td></tr>
+<tr><td>ViT-P3DE</td><td>全监督</td><td class="num">70.46</td><td class="num">86.92</td><td class="num">87.01</td><td class="num">89.49</td><td class="num">35.48</td></tr>
+<tr class="hl"><td>Self-MVA</td><td>无</td><td class="num">56.68</td><td class="num">92.31</td><td class="num">94.34</td><td class="num">91.73</td><td class="num">54.64</td></tr>
+</tbody></table></div>
+<ul>
+<li>IPAA-100 是"一对图像里所有人都关联对"的比例，比 AP 严格。Self-MVA 的 AP 低于两个全监督方法，但 IPAA-100 明显更高。作者的解释是 AP 不考虑"每人只能匹配一次"。</li>
+<li>MVOR 上 AP 86.50（ViT-P3DE 81.32）；SOLDIERS 上 IPAA-100 87.64（用标定极线约束的 OSNet 为 52.12）。</li>
+<li>消融：去掉同步或重投影任一项都无法收敛（AP 4.23 / 4.40）；加上伪边后 IPAA-100 从 24.05 升到 54.64。完全不用 Re-ID 特征时 AP 仍有 56.36。换成真值框训练 AP 80.03，再加身份标签 89.77。</li>
+</ul>
+
+<h3>局限（作者自述）</h3>
+<ul>
+<li><strong>只适用于静止相机</strong>：相机嵌入和各视角解码器都是固定的。作者给的两个方向是：预测相邻帧之间的相对位姿，或者靠强 3D 推理做一次性关联。</li>
+<li>过滤阈值要按数据集手调；只出现在一个视角里的人，会被匈牙利匹配强行配给别人。</li>
+</ul>
+
+<h3>对 v3</h3>
+<ul>
+<li><strong>不能直接用。</strong>v3 每个 action 的机位组合都不同，机位本身也在转和变焦，"每个视角一个固定相机嵌入"不成立。</li>
+<li><strong>最有价值的是它的数据</strong>：在外观相似的场景里，纯 re-ID（OSNet ACC 37.56）和只学外观的自监督（MvMHAT AP 4.44）都会崩，几何特征才是主力。这正是你"几何对应 + 坐标对应"方案的依据。</li>
+<li>可以借的：把匈牙利匹配放进损失、用"是否同一时刻"做免费监督、伪边线性约束。要用到 v3 上，得把固定的相机嵌入换成逐帧的相机条件，例如 #59 的 {K,R,t} 或场地线特征（我的推断，没人做过）。</li>
+</ul>
+</section>
+
+<section id="p2">
+<h2>2. MvMHAT：用对称与传递一致性自监督</h2>
+<p class="cite">Wei Feng, Feifan Wang, Ruize Han, Yiyang Gan, Zekun Qian, Junhui Hou, Song Wang. <em>Unveiling the Power of Self-Supervision for Multi-View Multi-Human Association and Tracking.</em> IEEE TPAMI 47(1):351–368, 2025。数据与代码已公开。</p>
+
+<h3>要解决的问题</h3>
+<p>多路同步视频里同时做两件事：每个视角内跨时间的跟踪，以及同一时刻跨视角的关联。全程不用身份标注。</p>
+
+<h3>方法</h3>
+<p>任意两帧（跨视角或跨时间）的人算相似度 \(S_{ij}=E_iE_j^{\top}\)，按行做带自适应温度的 softmax，得到匹配矩阵 \(X_{ij}\)。</p>
+<div class="eq"><div class="eq-head"><span class="src src-paper">原文 Eq. 12、14</span><span class="what">对称一致与传递一致</span></div>
+<div class="eq-body">\[ \mathbb I_S = X_{ij}\,X_{ji}\ \to\ \mathbf I,\qquad \mathbb I_T = X_{ij}\,X_{jk}\,X_{ki}\ \to\ \mathbf I \]</div>
+<div class="eq-note">从 I 走到 J 再走回 I，每个人应回到自己；I→J→K→I 同理。</div></div>
+<ul>
+<li><strong>不是每个人都出现在每一帧</strong>：用"虚拟节点"构造伪标签。某一行最大匹配分超过阈值 M=0.5，就认为这个人在对方帧里存在，对角元应为 1；否则为 0。为 1 的行要求对角比最大的非对角元大 margin（0.5）；为 0 的行要求对角与非对角接近（0.4）。</li>
+<li><strong>时空分配网络 STAN</strong>：把两个时刻 × 所有视角的人拼成一个大的相似度矩阵，送进一个 2 层 Transformer，输出全局分配矩阵 A。损失有三项：</li>
+</ul>
+<div class="eq"><div class="eq-head"><span class="src src-paper">原文 Eq. 28、30、40</span><span class="what">分配矩阵的三项自监督</span></div>
+<div class="eq-body">\[ L^{M}_{Pse}=\text{focal}(A,\ A_{sudo}),\qquad L^{M}_{Sym}=\lVert A-A^{\top}\rVert^2,\qquad L^{M}_{Trs}=\lVert A\rVert_{*} \]</div>
+<div class="eq-note">伪标签 \(A_{sudo}\) 由每个子块做匈牙利得到。传递一致等价于 \(A=P P^{\top}\)（P 是到"身份全集"的置换矩阵），对称时又等价于 A 半正定；作者用核范数 \(\lVert A\rVert_*\)（奇异值之和）近似这一约束。</div></div>
+<ul>
+<li>STAN 可以先用合成的带噪分配矩阵预训练，错误率 10% 时最好；不预训练也能收敛。</li>
+<li>推理：分块匈牙利得到跨视角关联；时间上用 DeepSORT 式级联匹配。一个人在某视角消失后重新出现时，可以凭其它视角的关联结果接回原 ID。</li>
+</ul>
+
+<h3>数据与结果</h3>
+<ul>
+<li>MvMHAT 基准：26 组、98 段、每组 3–4 个视角、共 9 万多帧；其中自采的 12 组用 <strong>4 台可穿戴 GoPro</strong>，视角差接近 90°，人工同步。另重组了 MMP-MvMHAT（室内，4–6 台相机，不用标定）。</li>
+</ul>
+<div class="tblwrap"><table>
+<thead><tr><th>MvMHAT 基准（Table II）</th><th class="num">IDF1</th><th class="num">跨视角 AF1</th><th class="num">MHAA</th></tr></thead>
+<tbody>
+<tr><td>DeepCC（re-ID + 谱聚类）</td><td class="num">44.4</td><td class="num">43.4</td><td class="num">43.8</td></tr>
+<tr><td>SVT（对称、循环一致约束）</td><td class="num">47.6</td><td class="num">52.5</td><td class="num">50.4</td></tr>
+<tr><td>前一版（ACM MM 2021）</td><td class="num">52.5</td><td class="num">49.5</td><td class="num">51.7</td></tr>
+<tr class="hl"><td>本文</td><td class="num">63.3</td><td class="num">69.5</td><td class="num">66.0</td></tr>
+</tbody></table></div>
+<ul>
+<li>MMP-MvMHAT 上 AF1 62.0（SVT 41.2）。</li>
+<li>消融里有一条对你有用的发现：<strong>加入跨时间跟踪后，跨视角关联也变好了</strong>——时序反过来帮关联。</li>
+</ul>
+
+<h3>局限（作者自述）</h3>
+<ul>
+<li>视野重叠太小时失效：核范数约束假设分配矩阵低秩，重叠少时不再成立。</li>
+<li><strong>人太多或太少都会变差。</strong>极端情况下一帧只有一个人，行 softmax 只有一列，匹配分恒为 1，反映不了真实关系。</li>
+</ul>
+
+<h3>对 v3</h3>
+<ul>
+<li><strong>可以直接加进训练的约束</strong>：一个 action 有 1 张直播 + 2 张以上回放时，用传递一致；虚拟节点处理"只出现在一个视角"；用 STAN 式的网络把一个 action 的所有视角联合求解，而不是两两独立配对。</li>
+<li><strong>两个风险</strong>：回放近景常只有两三个人，正落在它自述的"人太少"失效区；它的特征只学外观，Self-MVA 的表里它在 WILDTRACK 上 AP 只有 4.44，在同队球衣下不能单独用，必须配几何。</li>
+</ul>
+</section>
+
+<section id="p3">
+<h2>3. MAEM：用稠密人体网格做极线匹配</h2>
+<p class="cite">Li Yin, Qin Haobin, Tomohiro Suzuki, Calvin Yeung, Mariko Isogawa, Keisuke Fujii. <em>Mesh-Aware Epipolar Matching for Multi-View Multi-Person 3D Pose Estimation in Basketball.</em> arXiv 2605.29953, 2026。代码：github.com/Yinlipp/MAEM</p>
+
+<h3>要解决的问题</h3>
+<p>团队运动的多视角多人 3D 姿态估计。作者点明，在球类比赛里三种关联线索会同时失效：关键点被遮挡、队服相同使外观无法区分、相机离场地远时极线约束区分力下降。方法完全不训练，要求相机已标定。</p>
+
+<h3>方法</h3>
+<ol>
+<li>每个视角用 SAM 3D Body 为每个人恢复一个人体网格（18,439 个顶点），投影得到 2D 顶点。网格拓扑固定，同一编号的顶点在不同人、不同视角里对应同一个身体部位。</li>
+<li><strong>重投影粗筛</strong>：两个框的中心用 DLT 三角化成 3D 点，再投回两个视角，算平均重投影误差。</li>
+<li><strong>稠密网格极线细筛</strong>：</li>
+</ol>
+<div class="eq"><div class="eq-head"><span class="src src-paper">原文 Eq. 2–5</span><span class="what">基础矩阵、对极线与网格级极线距离</span></div>
+<div class="eq-body">\[ F_{ab}=K_b^{-\top}[\mathbf t_{ab}]_{\times}R_{ab}K_a^{-1},\qquad \mathbf l_k = F_{ab}\,\tilde{\mathbf u}^{a}_{\alpha,k},\qquad d_{mesh}(\alpha,\beta)=\frac{1}{N_v}\sum_{k=1}^{N_v}\operatorname{dist}\big(\mathbf u^{b}_{\beta,k},\ \mathbf l_k\big) \]</div>
+<div class="eq-note">对视角 a 中人 α 的每个网格顶点，在视角 b 画出对极线，算人 β 对应顶点到该线的距离再取平均。阈值 8 像素。</div></div>
+<ol start="4">
+<li>两道筛都通过的候选对做匈牙利匹配，再用并查集合并成跨多个视角的簇；同一相机的两个检测落进同一簇时，按代价剔除冲突。</li>
+<li>RANSAC 三角化得到 3D 姿态。</li>
+</ol>
+
+<h3>结果</h3>
+<ul>
+<li>数据：SportCenter EPFL（室内体育馆，高位鱼眼相机）和 Human-M3 Basketball（室外，人高度机位 4 台），都是固定标定相机，每视角约 12 人。</li>
+<li>SportCenter：recall 99.6%、MPJPE 59.8 mm；按 3D 姿态相似度匹配的基线为 86.3% / 65.7 mm。Human-M3：recall 83.7%、MPJPE 74.0 mm。靠外观加极线的 MVPose 在两个数据集上都完全失败（MPJPE 超过 2.8 m）。</li>
+</ul>
+<div class="tblwrap"><table>
+<thead><tr><th>消融（Human-M3，Table 5）</th><th class="num">Recall</th><th class="num">MPJPE (mm)</th></tr></thead>
+<tbody>
+<tr><td>只用重投影粗筛</td><td class="num">61.4</td><td class="num">95.8</td></tr>
+<tr><td>只用稠密网格极线</td><td class="num">75.1</td><td class="num">79.2</td></tr>
+<tr><td>重投影 + 15 个稀疏关键点极线</td><td class="num">47.5</td><td class="num">74.2</td></tr>
+<tr class="hl"><td>重投影 + 稠密网格极线</td><td class="num">83.7</td><td class="num">74.0</td></tr>
+</tbody></table></div>
+<ul>
+<li>两道筛互补：重投影能排除远处的人，但分不清挨着的人；网格极线分得清挨着的人，但对极线恰好与球员排列方向平行时会退化。</li>
+<li><strong>稠密点远胜稀疏点</strong>（recall 83.7 对 47.5）：视角只有 3–4 个时，一次误拒就可能让一个人凑不够最少视角数而被丢掉。</li>
+<li>单 CPU 线程每帧匹配 1.4–1.8 秒。</li>
+</ul>
+
+<h3>局限（作者自述）</h3>
+<p>精度受网格恢复模型的上限约束，严重遮挡或运动模糊时无法挽回；计算慢；逐帧处理，没有时序。另外它评测的是 3D 姿态，没有单独报告关联准确率。</p>
+
+<h3>对 v3</h3>
+<ul>
+<li>要标定，只能跑在 #59 已标定的 4,051 帧上；直播远景里球员很小，网格恢复质量存疑；回放近景里球员常被画面截断。</li>
+<li><strong>最适合当"纯几何、不训练"的基线。</strong>综述 5.6 第 4 个问题"纯几何在 v3 上跨视角能到多少"至今没有数字，它可以直接补上。</li>
+<li>"粗筛 + 稠密细筛"的级联，以及"稠密点远胜稀疏点"的证据，都可以直接用在你的几何对应部件上；这与 #81"脚点取法比标定器影响更大"的结论方向一致。</li>
+</ul>
+</section>
+
+<section id="p4">
+<h2>4. 多无人机的"冲突自由"跨视角关联</h2>
+<p class="cite">Xuqi Yang, Tong Wang, Ning Zhang, Zhe Yu, He Chen. <em>Detection With Association Constraints: Conflict-Free Cross-View Object Association Framework for Multidrone Systems.</em> IEEE TGRS 64, 2026。文中未给出代码地址。</p>
+
+<h3>要解决的问题</h3>
+<p>多架无人机同时拍，为同一目标分配全局唯一的 ID。作者批评"先检测、再关联"的流程：检测时用不上多视角信息；一对一约束靠规则强加，不能反向传播；两两匹配再按链式规则传递时会出现冲突，比如 A 配 B、B 配 C，但 A 又直接配了 C′。</p>
+
+<h3>方法（DETR 式自顶向下）</h3>
+<ul>
+<li><strong>多视角特征融合</strong>：各视角骨干（ResNet-50 或 ViT）提特征，先做 3 层跨视角交叉注意力，再拼接后做 3 层全局自注意力。</li>
+<li><strong>全局实例查询</strong>：25 个可学习的实例查询，从全局特征里各取出一个实例特征，每个实例对应一个物理目标、一个全局 ID。</li>
+<li><strong>多视角对象查询</strong>：每个实例绑定 K 个视角专属的对象查询，用"对象查询、实例特征、该视角特征"做交叉注意力，预测该视角里的框和置信度。</li>
+<li><strong>一对一靠结构保证</strong>：一个实例在每个视角最多输出一个框。训练用 DETR 式二分匹配加分类、回归、置信度损失。不需要相机参数，训练时也不需要精确的时间同步或 3D 标注。</li>
+</ul>
+<div class="eq"><div class="eq-head"><span class="src src-paper">原文 Eq. 26、28</span><span class="what">两两平均的 MDA 与"全视角全对"的 UCR</span></div>
+<div class="eq-body">\[ \text{MDA}=\frac{1}{C_N^2F}\sum_{j<k}\sum_{i=1}^{F}\frac{TA_{jk,i}}{GA_{jk,i}+FA_{jk,i}+MA_{jk,i}},\qquad \text{UCR}=\frac{N_{correct}}{N_{total}} \]</div>
+<div class="eq-note">UCR 只有在一个目标在所有视角都对（出现与否正确、IoU&gt;0.6、没有多个框抢同一 ID）时才计入。论文举例：9 条两两关联对了 7 条时 MDA≈0.58，但 3 个目标里只有 1 个全对，UCR=0.33。</div></div>
+
+<h3>结果</h3>
+<ul>
+<li>数据：MDMT、Cross-Drone（都只有两个视角），自建的 Rflysim 仿真四视角数据（10,864 张图，4 架动态飞行的无人机），以及两段真实三视角序列。</li>
+<li>Cross-Drone 上 MDA 最高 51.98（ViT）；自建四视角 MDA 38.87、UCR 22.17；真实场景 MDA 40.69、UCR 23.16。已有方法的 UCR 最高只有 17.13。</li>
+<li>视角数从 2 增到 4，MDA 从 30.12 升到 38.87：视角越多越占优。</li>
+</ul>
+
+<h3>局限</h3>
+<p>绝对数值不高。<strong>作者承认在两、三个视角的简单场景里，传统的混合关联方法仍有优势。</strong>全局建模计算量大。</p>
+
+<h3>对 v3</h3>
+<ul>
+<li>v3 平均每个 action 只有 1.66 张回放，多数只有两个视角，正是它自认不占优的区间；它同时做检测，而 v3 已经给了球员框。</li>
+<li>能借的是<strong>评测指标</strong>：UCR 这种"全视角全对才算对"的指标，比两两平均更适合评 3 个视角以上的 action。"实例查询 + 视角查询"的结构，可以作为 SuperGlue 式两两匹配之外的另一条端到端路线来对比。</li>
+</ul>
+</section>
+
+<section id="p5">
+<h2>5. SGC-CCA：把跨相机关联当作有监督图聚类</h2>
+<p class="cite">Đorđe Nedeljković. <em>Cross-Camera Data Association via GNN for Supervised Graph Clustering.</em> arXiv 2410.00643, 2024。代码：github.com/djordjened92/cca-gnnclust</p>
+
+<h3>方法</h3>
+<ul>
+<li>节点是同一时刻所有相机里的检测框，初始特征为预训练 re-ID 特征；用标定得到的单应矩阵，把框底边中点投到地平面。</li>
+<li>建边：每个节点只连向每个其它相机里最近的一个节点，因为一个人在每个视角最多出现一次。</li>
+</ul>
+<div class="eq"><div class="eq-head"><span class="src src-paper">原文 Eq. 2、4</span><span class="what">外观 × 地面距离的节点距离；边分类器同时看特征和坐标</span></div>
+<div class="eq-body">\[ m_{ij}=\big(1-\langle h_i,h_j\rangle\big)\cdot\frac{\lVert(\hat x_i-\hat x_j,\ \hat y_i-\hat y_j)\rVert_2}{\max_{p,q}\lVert(\hat x_p-\hat x_q,\ \hat y_p-\hat y_q)\rVert_2},\qquad \hat r_{ij}=\sigma\big(\theta([h'_i,\hat x_i,\hat y_i,h'_j,\hat x_j,\hat y_j])\big) \]</div></div>
+<ul>
+<li>在层级 GNN 聚类方法 Hi-LANDER 的基础上改：GCN 消息传递后预测每条边是否连接、每个节点的"密度"；只保留指向密度更高邻居的边，得到连通分量，每个分量就是一个身份；可多层级合并，地面坐标取均值往上传。</li>
+</ul>
+
+<h3>结果</h3>
+<ul>
+<li>数据：EPFL 的 Terrace、Laboratory、Basketball 三个场景，4 个重叠视角，每个视角最多 9 人，有标定。</li>
+<li>平均 ARI 88.05、V-measure 94.31。对比 GNN-CCA：原论文报告 84.76 / 93.00，作者复现 81.79 / 90.82。消息传递 2 步即饱和。</li>
+</ul>
+
+<h3>局限</h3>
+<p>7 页短文，个人研究者，只在 arXiv 发表；依赖标定；场景小、人少。</p>
+
+<h3>对 v3</h3>
+<ul>
+<li>代码开源、结构简单，能最快搭出一个"有监督、所有视角一起聚类"的基线。</li>
+<li>地面坐标项需要标定，完整版只能在 #59 的子集上跑；"每个其它视角只连一个最近邻"的建边方式，在每个 action 只有两个视角时就退化成了两两匹配。</li>
+</ul>
+</section>
+
+<section id="p6">
+<h2>6. FUSION / RealMvMoAT：移动相机下的多线索关联</h2>
+<p class="cite">Ruiqi Wu, Bingliang Jiao, Ruize Han, Hangzheng Yu, Xunkai Jiang, Shining Wang, Yuanqi Hu 等. <em>Beyond Appearance: A Multi-cue Framework and Large-scale Benchmark for Pedestrian Association and Tracking on Mobile Aerial–Ground Platforms.</em> arXiv 2607.23803, 2026。数据集公开；文中未见代码地址。</p>
+
+<h3>数据集 RealMvMoAT</h3>
+<p>52 组同步视频、314 段、50.49 万帧，30 fps，3200×1800；每组 10–28 人、5–7 个视角（最多 5 架无人机 + 1–2 台地面运动相机）；730 万个带身份的框。相机运动包括环绕、悬停旋转、横移、之字飞行；场景里有篮球场和足球场。按场景划分训练集与测试集。</p>
+
+<h3>方法</h3>
+<p>基线是只用外观的简化版 MvMHAT。在此之上加两个模块：</p>
+<ul>
+<li><strong>多线索自适应组合（MAC）</strong>，四路分支各算一个相似度：
+  <ul>
+  <li>外观；</li>
+  <li>局部上下文：对人周围做语义分割，按面积占比 &gt; 2% 二值化成多热向量，再线性映射成嵌入；</li>
+  <li>3D 结构：从骨干特征回归 SMPL 的姿态（24×3）和体型（10 维），训练时要求同步多视角之间一致；</li>
+  <li>邻居关系：每人连 4 个最近邻（按框中心距离，身高差大时放大距离以近似深度），用 GATv2 聚合。</li>
+  </ul></li>
+</ul>
+<div class="eq"><div class="eq-head"><span class="src src-paper">原文 Eq. 14–17</span><span class="what">每帧一组融合权重，所有视角、所有人共享</span></div>
+<div class="eq-body">\[ \bar F_t=\frac{1}{\sum_i N_{i,t}}\sum_{i}\sum_{k}F_{i,k,t},\qquad \alpha_t=\operatorname{Softmax}\big(\psi(\bar F_t)\big),\qquad S^{*}_t=\sum_{m}\alpha_{t,m}\,\tilde S^{m}_t \]</div>
+<div class="eq-note">m 取外观、上下文、姿态、体型、邻居五种；\(\tilde S^m\) 是各线索归一化后的余弦相似度矩阵。</div></div>
+<ul>
+<li><strong>在线多视角特征同步（OMFS）</strong>：为每个身份维护长度 100 的、跨时间跨视角的特征库，用交叉注意力精炼轨迹特征，主要服务于时序跟踪。</li>
+</ul>
+
+<h3>结果</h3>
+<div class="tblwrap"><table>
+<thead><tr><th>RealMvMoAT（Table II）</th><th class="num">跨视角 AF1</th><th class="num">MHAA</th><th class="num">IDF1</th></tr></thead>
+<tbody>
+<tr><td>外观基线</td><td class="num">51.7</td><td class="num">38.1</td><td class="num">58.7</td></tr>
+<tr><td>MvMHAT*</td><td class="num">55.1</td><td class="num">41.0</td><td class="num">60.8</td></tr>
+<tr class="hl"><td>FUSION</td><td class="num">65.7</td><td class="num">49.8</td><td class="num">74.4</td></tr>
+</tbody></table></div>
+<div class="tblwrap"><table>
+<thead><tr><th>消融（子集，Table III）</th><th class="num">跨视角 AF1</th><th class="num">相对基线</th></tr></thead>
+<tbody>
+<tr><td>外观基线</td><td class="num">45.9</td><td class="num">—</td></tr>
+<tr class="hl"><td>+ 3D 结构（姿态 + 体型）</td><td class="num">52.9</td><td class="num">+7.0</td></tr>
+<tr><td>+ 局部上下文</td><td class="num">49.8</td><td class="num">+3.9</td></tr>
+<tr><td>+ 邻居关系</td><td class="num">49.5</td><td class="num">+3.6</td></tr>
+<tr><td>四路等权融合</td><td class="num">54.3</td><td class="num">+8.4</td></tr>
+<tr><td>四路自适应融合（MAC）</td><td class="num">55.2</td><td class="num">+9.3</td></tr>
+</tbody></table></div>
+<ul>
+<li><strong>3D 结构是单项增益最大的线索</strong>；自适应融合只比等权多 0.9。</li>
+<li>OMFS 主要提升时序：IDF1 从 51.5 升到 62.0。</li>
+</ul>
+
+<h3>局限</h3>
+<p>未正式发表，未给出代码；不使用号码这类身份属性；融合权重按帧而不是按人。</p>
+
+<h3>对 v3</h3>
+<ul>
+<li><strong>设定最接近</strong>：相机在动、视角差大、同步多视角，场景里也有球场。</li>
+<li>3D 结构线索对你最有用：同队球衣相同时，体型与姿态是外观之外的身份线索，而且它在这里是单项增益最大的。邻居关系分支对应"阵型与相对位置"。局部上下文在足球场上可能帮助不大，因为背景几乎都是草地（我的推断）。</li>
+<li>你想要的"号码读得清就多信号码、标定可靠就多信坐标"是逐人、逐线索的门控，它没有做，需要自己在它的融合框架上改。</li>
+</ul>
+</section>
+
+<section id="fit">
+<h2>拼到你的方案里</h2>
+
+<h3 id="fit-parts">按部件对照</h3>
+<div class="tblwrap"><table>
+<thead><tr><th>你方案里的部件</th><th>可以借的做法</th><th>来源</th><th>在 v3 上的前提</th></tr></thead>
+<tbody>
+<tr><td>几何对应（极线）</td><td>框中心重投影粗筛 + 稠密人体网格极线细筛</td><td><a href="#p3">MAEM</a></td><td>需要标定，只有 #59 的 4,051 帧</td></tr>
+<tr><td>坐标对应（球场平面）</td><td>地面坐标同时进入节点距离与边分类</td><td><a href="#p5">SGC-CCA</a></td><td>需要标定</td></tr>
+<tr><td>无标定时的几何</td><td>框布局的几何编码 + "是否同一时刻"做监督</td><td><a href="#p1">Self-MVA</a></td><td>要把固定相机嵌入换成逐帧相机条件（作者自述不支持移动相机）</td></tr>
+<tr><td>相对位置 / 阵型</td><td>最近邻图 + GATv2</td><td><a href="#p6">FUSION</a></td><td>不需要标定</td></tr>
+<tr><td>外观之外的身份线索</td><td>SMPL 姿态 + 体型，多视角一致性训练</td><td><a href="#p6">FUSION</a></td><td>远景小人的回归质量存疑</td></tr>
+<tr><td>一对一互斥</td><td>匈牙利放进损失；虚拟节点；实例查询与视角查询绑定</td><td><a href="#p1">Self-MVA</a>、<a href="#p2">MvMHAT</a>、<a href="#p4">TGRS</a></td><td>—</td></tr>
+<tr><td>多视角一致性</td><td>对称、传递、核范数；Transformer 联合求分配</td><td><a href="#p2">MvMHAT</a></td><td>传递一致需要 ≥3 个视角的 action</td></tr>
+<tr><td>评测</td><td>UCR（全视角全对）；IPAA-X（一对图像内准确率 ≥X% 的比例）</td><td><a href="#p4">TGRS</a>、<a href="#p1">Self-MVA</a></td><td>—</td></tr>
+</tbody></table></div>
+
+<h3 id="fit-v3">v3 的五个特殊条件，以及它们卡住了谁</h3>
+<ol>
+<li><strong>相机在动，每个 action 的机位组合都不同。</strong>Self-MVA 不能直接用；MAEM、SGC-CCA 需要逐帧标定。只有 FUSION 与 TGRS 是为移动相机设计的。</li>
+<li><strong>多数 action 只有两个视角</strong>（平均 1.66 张回放）。传递一致性只能用在少数多回放的 action 上；TGRS 自认在两、三视角下不占优。</li>
+<li><strong>回放近景人少。</strong>MvMHAT 自述"人太少"时匹配矩阵会退化；Self-MVA 的框布局几何在两三个人时信息很少。</li>
+<li><strong>标定只覆盖约三分之一。</strong>MAEM、SGC-CCA 的完整版只能跑在已标定子集上，模型必须能在没有坐标时退化到外观 + 约束。</li>
+<li><strong>同队球衣相同。</strong>只学外观的自监督会崩（MvMHAT 在 WILDTRACK 上 AP 4.44）；需要几何、3D 结构或号码来补。</li>
+</ol>
+
+<h3 id="fit-order">阅读顺序</h3>
+<ol>
+<li><strong>FUSION</strong>：设定最接近，消融直接告诉你哪种视角不变线索最值钱。</li>
+<li><strong>MvMHAT</strong>：多视角一致性约束的完整推导，可以直接加进训练。</li>
+<li><strong>MAEM</strong>：纯几何基线的做法，也是"稠密点胜稀疏点"的证据。</li>
+<li><strong>Self-MVA</strong>：说明几何在外观相似时是主力；"把匈牙利放进损失"的写法。</li>
+<li><strong>SGC-CCA</strong>：有代码，用来最快搭一个有监督基线。</li>
+<li><strong>TGRS</strong>：主要借 UCR 指标。</li>
+</ol>
+
+<footer class="colophon">六篇均为全文精读，数字回原文核对；"对 v3"部分与标注"推断"的内容是我的判断，不出自论文本身。PDF 与目录见本地"多视角人员关联_参考论文"文件夹。<a href="index.html">返回文献工作台</a> · <a href="citations.html">跨视角球员重识别综述</a></footer>
+</section>
+
+</main>
+</div>
+
+</body></html>
